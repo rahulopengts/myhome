@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openhab.ui.webapp.internal.render.*;
 import org.eclipse.emf.common.util.EList;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
@@ -39,13 +40,23 @@ public class WebAppServletTest extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebAppServletTest.class);
 
+	private PageRenderer renderer;
+	
+	public PageRenderer getRenderer() {
+		return renderer;
+	}
+
+	public void setRenderer(PageRenderer renderer) {
+		this.renderer = renderer;
+	}
+
 	/** timeout for polling requests in milliseconds; if no state changes during this time, 
 	 *  an empty response is returned.
 	 */
 	private static final long TIMEOUT_IN_MS = 10000L;
 
 	/** the name of the servlet to be used in the URL */
-	public static final String SERVLET_NAME = "openhab.app1";
+	public static final String SERVLET_NAME = "/profile";
 		
 	protected SitemapProvider sitemapProvider;
 	
@@ -86,7 +97,8 @@ public class WebAppServletTest extends HttpServlet {
 			throws ServletException, IOException {
 		logger.debug("Servlet request received!");
 
-		System.out.println("\n NEW SERVLET");;
+		System.out.println("\n NEW SERVLET");
+		
 		// read request parameters
 		String sitemapName = (String) req.getParameter("sitemap");
 		String widgetId = (String) req.getParameter("w");
@@ -98,7 +110,7 @@ public class WebAppServletTest extends HttpServlet {
 		
 		StringBuilder result = new StringBuilder();
 		
-		Sitemap sitemap = sitemapProvider.getSitemap(sitemapName);
+		//Sitemap sitemap = sitemapProvider.getSitemap(sitemapName);
 		
 //**************************
 		//System.out.println(" SitemapNameAA"+sitemapName+" Sitemap-- ");//);
@@ -107,12 +119,14 @@ public class WebAppServletTest extends HttpServlet {
 //**************************		
 		
 		try {
-			if(sitemap==null) {
-				throw new RenderException("Sitemap '" + sitemapName + "' could not be found");
-			}
+//			if(sitemap==null) {
+//				throw new RenderException("Sitemap '" + sitemapName + "' could not be found");
+//			}
+			System.out.println("\n In New Servlet ");
+			/*
 			logger.debug("reading sitemap {}", sitemap.getName());
 			System.out.println("\n Sitemap Name : "+sitemap.getName());
-			/*
+			
 			if(widgetId==null || widgetId.isEmpty() || widgetId.equals("Home")) {
 				// we are at the homepage, so we render the children of the sitemap root node
 				String label = sitemap.getLabel()!=null ? sitemap.getLabel() : sitemapName;
@@ -151,7 +165,7 @@ public class WebAppServletTest extends HttpServlet {
 				
 			}
 			*/
-		} catch(RenderException e) {
+		} catch (Exception e){//(RenderException e) {
 			e.printStackTrace();
 			throw new ServletException(e.getMessage(), e);
 		}
@@ -271,7 +285,7 @@ public class WebAppServletTest extends HttpServlet {
 	}
 	
 	/** the root path of this web application */
-	public static final String WEBAPP_ALIAS = "/";
+	public static final String WEBAPP_ALIAS = "/hub";
 		
 	protected HttpService httpService;
 	protected ItemRegistry itemRegistry;
