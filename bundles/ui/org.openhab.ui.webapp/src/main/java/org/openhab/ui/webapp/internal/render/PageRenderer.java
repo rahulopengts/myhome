@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.openhab.model.sitemap.Frame;
 import org.openhab.model.sitemap.Sitemap;
@@ -125,6 +126,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 				// no %children% placeholder found or at the end
 				if(parts.length==1) {
 					new_pre.append(widgetSB);
+					
 				}
 				// %children% section found 
 				if(parts.length>1) {
@@ -139,7 +141,11 @@ public class PageRenderer extends AbstractWidgetRenderer {
 				processChildren(new_pre, new_post, nextChildren);
 				sb_pre.append(new_pre);
 				sb_pre.append(new_post);
+				
+				System.out.println("\n PageRenderer : ProcessChildren Pre : "+sb_pre);
+				System.out.println("\n PageRenderer : ProcessChildren Post: "+sb_post);
 			} else {
+				System.out.println("\n PageRenderer : ProcessChildren sb_pre: "+sb_pre);
 				sb_pre.append(widgetSB);
 			}
 		}
@@ -156,6 +162,9 @@ public class PageRenderer extends AbstractWidgetRenderer {
 
 		for(WidgetRenderer renderer : widgetRenderers) {
 			if(renderer.canRender(w)) {
+				//String ren =	renderer.renderWidget(w, sb)
+				System.out.println("\n Render : "+w + " SB : "+sb.toString());
+				printContent(w);
 				return renderer.renderWidget(w, sb);
 			}
 		}
@@ -167,5 +176,15 @@ public class PageRenderer extends AbstractWidgetRenderer {
 	 */
 	public boolean canRender(Widget w) {
 		return false;		
+	}
+	
+	public void printContent(Widget w){
+		TreeIterator t	=	 w.eAllContents();
+		while(t.hasNext()){
+			Object o	=	t.next();
+			System.out.println(o);
+		}
+		EList elist	=	w.eContents();
+		System.out.println("\n Elist : "+elist.toString());
 	}
 }

@@ -22,6 +22,7 @@ public final class WebAppActivatorTest implements BundleActivator {
 	 * Called whenever the OSGi framework starts our bundle
 	 */
 	public void start(BundleContext bc) throws Exception {
+		
 		context = bc;
 	}
 

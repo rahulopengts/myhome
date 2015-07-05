@@ -9,7 +9,11 @@
     http://www.eclipse.org/legal/epl-v10.html
 
 -->
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="org.openhab.ui.webapp.webappservlet">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="org.openhab.binding.testbinding.WebAppServletTest">
    <implementation class="org.openhab.binding.testbinding.internal.servlet.WebAppServletTest"/>
+   <reference bind="setSitemapProvider" cardinality="1..1" interface="org.openhab.model.sitemap.SitemapProvider" name="SitemapProvider" policy="dynamic" unbind="unsetSitemapProvider"/>
    <reference bind="setHttpService" cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="dynamic" unbind="unsetHttpService"/>
+   <reference bind="setItemRegistry" cardinality="1..1" interface="org.openhab.core.items.ItemRegistry" name="ItemRegistry" policy="dynamic" unbind="unsetItemRegistry"/>
+<reference bind="setPageRendererExt" cardinality="1..1" interface="org.openhab.binding.testbinding.internal.renderer.PageRendererExt" name="PageRendererExt" policy="static"/>
+
 </scr:component>

@@ -39,6 +39,13 @@ Import-Package: org.apache.commons.io,
 Export-Package: org.openhab.binding.testbinding
 Bundle-DocURL: http://www.openhab.org
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Service-Component: OSGI-INF/binding.xml, OSGI-INF/testbindingwebapp.xml,OSGI-INF/genericbindingprovider.xml
+Service-Component: OSGI-INF/binding.xml, OSGI-INF/testbindingwebapp.xml,OSGI-INF/genericbindingprovider.xml,
+ OSGI-INF/pagerendererext.xml,OSGI-INF/grouprendererext.xml, 
+ OSGI-INF/framerendererext.xml,OSGI-INF/switchrendererext.xml, 
+ OSGI-INF/selectionrendererext.xml,OSGI-INF/listrenderer.xml, 
+ OSGI-INF/textrendererext.xml, OSGI-INF/imagerendererext.xml, 
+ OSGI-INF/sliderrendererext.xml, OSGI-INF/chartrendererext.xml, 
+ OSGI-INF/videorendererext.xml, OSGI-INF/webviewrendererext.xml, 
+ OSGI-INF/setpointrendererext.xml,OSGI-INF/colorpickerrendererext.xml
 Require-Bundle: javax.servlet
 Bundle-ClassPath: .

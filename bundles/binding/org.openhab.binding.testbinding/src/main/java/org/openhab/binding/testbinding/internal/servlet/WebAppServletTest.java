@@ -10,11 +10,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.openhab.ui.webapp.internal.render.*;
 import org.eclipse.emf.common.util.EList;
+import org.openhab.binding.testbinding.internal.renderer.PageRendererExt;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -27,6 +25,7 @@ import org.openhab.model.sitemap.LinkableWidget;
 import org.openhab.model.sitemap.Sitemap;
 import org.openhab.model.sitemap.SitemapProvider;
 import org.openhab.model.sitemap.Widget;
+import org.openhab.ui.webapp.internal.render.PageRenderer;
 import org.openhab.ui.webapp.render.RenderException;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
@@ -34,20 +33,20 @@ import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.org.apache.xerces.internal.impl.dv.xs.BaseSchemaDVFactory;
-
 public class WebAppServletTest extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebAppServletTest.class);
 
-	private PageRenderer renderer;
+	private PageRendererExt pageRendererExt;
 	
-	public PageRenderer getRenderer() {
-		return renderer;
+
+	public PageRendererExt getPageRendererExt() {
+		return pageRendererExt;
 	}
 
-	public void setRenderer(PageRenderer renderer) {
-		this.renderer = renderer;
+	public void setPageRendererExt(PageRendererExt pageRenderer) {
+		System.out.println("\n setPageRenderer");
+		this.pageRendererExt = pageRenderer;
 	}
 
 	/** timeout for polling requests in milliseconds; if no state changes during this time, 
@@ -59,6 +58,7 @@ public class WebAppServletTest extends HttpServlet {
 	public static final String SERVLET_NAME = "/profile";
 		
 	protected SitemapProvider sitemapProvider;
+	
 	
 	
 	public void setSitemapProvider(SitemapProvider sitemapProvider) {
@@ -73,6 +73,7 @@ public class WebAppServletTest extends HttpServlet {
 	
 	protected void activate() {
 		try {			
+			System.out.println("activate Test");
 			Hashtable<String, String> props = new Hashtable<String, String>();
 			httpService.registerServlet(WEBAPP_ALIAS + SERVLET_NAME, this, props, createHttpContext());
 			httpService.registerResources(WEBAPP_ALIAS, "web", null);
@@ -97,20 +98,27 @@ public class WebAppServletTest extends HttpServlet {
 			throws ServletException, IOException {
 		logger.debug("Servlet request received!");
 
-		System.out.println("\n NEW SERVLET");
-		
+		System.out.println("\n NEW SERVLET ");
+		//if(renderer==null){
+			//renderer	=	new PageRenderer();
+			
+		//}
 		// read request parameters
 		String sitemapName = (String) req.getParameter("sitemap");
 		String widgetId = (String) req.getParameter("w");
 		boolean async = "true".equalsIgnoreCase((String) req.getParameter("__async"));
 		boolean poll = "true".equalsIgnoreCase((String) req.getParameter("poll"));
 				
+		System.out.println("\n async "+async+" poll "+poll);
+		
 		// if there are no parameters, display the "default" sitemap
-		if(sitemapName==null) sitemapName = "default";
+		//if(sitemapName==null) 
+		sitemapName = "demo";
+		
 		
 		StringBuilder result = new StringBuilder();
 		
-		//Sitemap sitemap = sitemapProvider.getSitemap(sitemapName);
+		Sitemap sitemap = sitemapProvider.getSitemap(sitemapName);
 		
 //**************************
 		//System.out.println(" SitemapNameAA"+sitemapName+" Sitemap-- ");//);
@@ -119,15 +127,16 @@ public class WebAppServletTest extends HttpServlet {
 //**************************		
 		
 		try {
-//			if(sitemap==null) {
-//				throw new RenderException("Sitemap '" + sitemapName + "' could not be found");
-//			}
-			System.out.println("\n In New Servlet ");
-			/*
+			if(sitemap==null) {
+				throw new RenderException("Sitemap '" + sitemapName + "' could not be found");
+			}
+			//System.out.println("\n In New Servlet ");
+			
 			logger.debug("reading sitemap {}", sitemap.getName());
-			System.out.println("\n Sitemap Name : "+sitemap.getName());
+			//System.out.println("\n Sitemap Name : "+sitemap.getName());
 			
 			if(widgetId==null || widgetId.isEmpty() || widgetId.equals("Home")) {
+				System.out.println(" \\n Widget ID "+widgetId);
 				// we are at the homepage, so we render the children of the sitemap root node
 				String label = sitemap.getLabel()!=null ? sitemap.getLabel() : sitemapName;
 				EList<Widget> children = sitemap.getChildren();
@@ -139,32 +148,35 @@ public class WebAppServletTest extends HttpServlet {
 					return;
 				}
 				
-				StringBuilder testBuilder	=	renderer.processPage("Home", sitemapName, label, sitemap.getChildren(), async);
-				System.out.println("Chile Size : \n "+ childSize);
+				StringBuilder testBuilder	=	pageRendererExt.processPage("Home", sitemapName, label, sitemap.getChildren(), async);
+				//System.out.println("Chile Size : \n "+ childSize);
 				result.append(testBuilder);
 			} else if(!widgetId.equals("Colorpicker")) {
+				
 				// we are on some subpage, so we have to render the children of the widget that has been selected
-				Widget w = renderer.getItemUIRegistry().getWidget(sitemap, widgetId);
+				Widget w = pageRendererExt.getItemUIRegistry().getWidget(sitemap, widgetId);
+				
+				System.out.println(" \\n Colorpicker widgetId :"+widgetId+" Widget Id :"+w.getItem()+" Label "+w.getLabel());
 				if(w!=null) {
 					if(!(w instanceof LinkableWidget)) {
 						throw new RenderException("Widget '" + w + "' can not have any content");
 					}
-					EList<Widget> children = renderer.getItemUIRegistry().getChildren((LinkableWidget) w);
+					EList<Widget> children = pageRendererExt.getItemUIRegistry().getChildren((LinkableWidget) w);
 					int childSize	=	children.size();
-					System.out.println("\n Child Size "+childSize);
+					//System.out.println("\n Child Size "+childSize);
 					if(poll && waitForChanges(children)==false) {
 						// we have reached the timeout, so we do not return any content as nothing has changed
 						res.getWriter().append(getTimeoutResponse()).close();
 						return;
 					}
-					String label = renderer.getItemUIRegistry().getLabel(w);
+					String label = pageRendererExt.getItemUIRegistry().getLabel(w);
 					if (label==null) label = "undefined";
-					result.append(renderer.processPage(renderer.getItemUIRegistry().getWidgetId(w), sitemapName, label, children, async));
+					result.append(pageRendererExt.processPage(pageRendererExt.getItemUIRegistry().getWidgetId(w), sitemapName, label, children, async));
 				}
 				
 				
 			}
-			*/
+			
 		} catch (Exception e){//(RenderException e) {
 			e.printStackTrace();
 			throw new ServletException(e.getMessage(), e);
@@ -174,7 +186,8 @@ public class WebAppServletTest extends HttpServlet {
 		} else {
 			res.setContentType("text/html;charset=UTF-8");
 		}
-		System.out.println("Testing : \n "+ result.toString());
+		
+		System.out.println("Testing New Servlet: \n "+ result.toString());
 		res.getWriter().append(result);
 		res.getWriter().close();
 	}

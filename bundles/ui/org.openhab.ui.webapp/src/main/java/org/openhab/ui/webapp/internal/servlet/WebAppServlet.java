@@ -97,7 +97,7 @@ public class WebAppServlet extends BaseServlet {
 	public void service(ServletRequest req, ServletResponse res)
 			throws ServletException, IOException {
 		logger.debug("Servlet request received!");
-
+		System.out.println("Servlet request received!");
 		// read request parameters
 		String sitemapName = (String) req.getParameter("sitemap");
 		String widgetId = (String) req.getParameter("w");
@@ -122,7 +122,7 @@ public class WebAppServlet extends BaseServlet {
 				throw new RenderException("Sitemap '" + sitemapName + "' could not be found");
 			}
 			logger.debug("reading sitemap {}", sitemap.getName());
-			System.out.println("\n Sitemap Name : "+sitemap.getName());
+			//System.out.println("\n Sitemap Name : "+sitemap.getName());
 			if(widgetId==null || widgetId.isEmpty() || widgetId.equals("Home")) {
 				// we are at the homepage, so we render the children of the sitemap root node
 				String label = sitemap.getLabel()!=null ? sitemap.getLabel() : sitemapName;
@@ -136,7 +136,7 @@ public class WebAppServlet extends BaseServlet {
 				}
 				
 				StringBuilder testBuilder	=	renderer.processPage("Home", sitemapName, label, sitemap.getChildren(), async);
-				System.out.println("Chile Size : \n "+ childSize);
+				//System.out.println("Chile Size : \n "+ childSize);
 				result.append(testBuilder);
 			} else if(!widgetId.equals("Colorpicker")) {
 				// we are on some subpage, so we have to render the children of the widget that has been selected
@@ -147,7 +147,7 @@ public class WebAppServlet extends BaseServlet {
 					}
 					EList<Widget> children = renderer.getItemUIRegistry().getChildren((LinkableWidget) w);
 					int childSize	=	children.size();
-					System.out.println("\n Child Size "+childSize);
+					//System.out.println("\n Child Size "+childSize);
 					if(poll && waitForChanges(children)==false) {
 						// we have reached the timeout, so we do not return any content as nothing has changed
 						res.getWriter().append(getTimeoutResponse()).close();
@@ -168,7 +168,7 @@ public class WebAppServlet extends BaseServlet {
 		} else {
 			res.setContentType("text/html;charset=UTF-8");
 		}
-		System.out.println("Testing : \n "+ result.toString());
+		//System.out.println("Testing : \n "+ result.toString());
 		res.getWriter().append(result);
 		res.getWriter().close();
 	}

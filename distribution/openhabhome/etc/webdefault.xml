@@ -127,21 +127,8 @@
     <load-on-startup>0</load-on-startup>
   </servlet> 
 
-  <servlet-mapping> <servlet-name>default</servlet-name> <url-pattern>/openhab*</url-pattern> </servlet-mapping>
+  <servlet-mapping> <servlet-name>default</servlet-name> <url-pattern>/*</url-pattern> </servlet-mapping>
 
-<!-- START OF NEW SERVLET -->
-
-  <servlet>
-    <servlet-name>defaultext</servlet-name>
-    <servlet-class>org.openhab.ui.webapp.internal.servlet.WebAppServletAppEXT</servlet-class>
-
-    <load-on-startup>0</load-on-startup>
-  </servlet> 
-
-  <servlet-mapping> <servlet-name>defaultext</servlet-name> <url-pattern>/conf</url-pattern> </servlet-mapping>
-
-
-<!--  END OF NEW SERVLET -->
   
   <!-- ==================================================================== -->
   <session-config>
