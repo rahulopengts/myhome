@@ -10,8 +10,11 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.emf.common.util.EList;
+import org.openhab.binding.testbinding.common.HubUtility;
 import org.openhab.binding.testbinding.internal.renderer.PageRendererExt;
 import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
@@ -33,7 +36,7 @@ import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebAppServletTest extends HttpServlet {
+public class WebAppServletTest extends BaseServletExt {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebAppServletTest.class);
 
@@ -45,7 +48,7 @@ public class WebAppServletTest extends HttpServlet {
 	}
 
 	public void setPageRendererExt(PageRendererExt pageRenderer) {
-		System.out.println("\n setPageRenderer");
+		//System.out.println("\n setPageRenderer");
 		this.pageRendererExt = pageRenderer;
 	}
 
@@ -73,7 +76,7 @@ public class WebAppServletTest extends HttpServlet {
 	
 	protected void activate() {
 		try {			
-			System.out.println("activate Test");
+			//System.out.println("activate Test");
 			Hashtable<String, String> props = new Hashtable<String, String>();
 			httpService.registerServlet(WEBAPP_ALIAS + SERVLET_NAME, this, props, createHttpContext());
 			httpService.registerResources(WEBAPP_ALIAS, "web", null);
@@ -97,8 +100,11 @@ public class WebAppServletTest extends HttpServlet {
 	public void service(ServletRequest req, ServletResponse res)
 			throws ServletException, IOException {
 		logger.debug("Servlet request received!");
-
-		System.out.println("\n NEW SERVLET ");
+		System.out.println("\n NEW SERVLET SERVICE :");
+		HttpServletRequest	httpRequest	=	(HttpServletRequest)req;
+		String requestPATH	=	httpRequest.getRequestURI();
+		
+		
 		//if(renderer==null){
 			//renderer	=	new PageRenderer();
 			
@@ -120,6 +126,13 @@ public class WebAppServletTest extends HttpServlet {
 		
 		Sitemap sitemap = sitemapProvider.getSitemap(sitemapName);
 		
+		int actionID	=	evalRequest((HttpServletRequest)req, (HttpServletResponse)res);
+		System.out.println("\n NEW SERVLET :"+requestPATH+" : "+actionID);
+		
+		
+		
+		
+		
 //**************************
 		//System.out.println(" SitemapNameAA"+sitemapName+" Sitemap-- ");//);
 		logger.debug(" async "+async+" poll "+poll);
@@ -127,6 +140,16 @@ public class WebAppServletTest extends HttpServlet {
 //**************************		
 		
 		try {
+			if(actionID==1){
+				System.out.println("\n RETURN");
+				StringBuilder pageContent	=	pageRendererExt.processPageCreateProfile("Home", sitemapName, sitemapName, sitemap.getChildren(), async);
+				res.getWriter().append(pageContent);
+				res.getWriter().close();
+				return;
+			}
+			
+			
+			
 			if(sitemap==null) {
 				throw new RenderException("Sitemap '" + sitemapName + "' could not be found");
 			}
@@ -298,7 +321,7 @@ public class WebAppServletTest extends HttpServlet {
 	}
 	
 	/** the root path of this web application */
-	public static final String WEBAPP_ALIAS = "/hub";
+
 		
 	protected HttpService httpService;
 	protected ItemRegistry itemRegistry;
@@ -331,4 +354,24 @@ public class WebAppServletTest extends HttpServlet {
 	}
 	
 
+	public int evalRequest(HttpServletRequest req, HttpServletResponse res){
+		String requestAction	=	req.getParameter(HubUtility.HUB_ACTION_PARAM);
+		try{
+
+			HubUtility.printDebugMessage(this.toString(),"RequestionAction is "+requestAction);
+
+		if(requestAction!=null && requestAction.equals(HubUtility.CREATE)){
+			HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 1");
+			return 1;
+		} else if(requestAction!=null && requestAction.equals(HubUtility.SUBMIT)){
+			HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 2");
+			return 2;
+		}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		return 0;
+		
+	}
+	
 }

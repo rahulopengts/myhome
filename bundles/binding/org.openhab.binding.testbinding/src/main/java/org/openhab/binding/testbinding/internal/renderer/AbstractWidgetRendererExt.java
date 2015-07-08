@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.openhab.binding.testbinding.common.HubUtility;
 import org.openhab.binding.testbinding.internal.WebAppActivatorTest;
 import org.openhab.model.sitemap.Widget;
 import org.openhab.ui.items.ItemUIRegistry;
@@ -87,6 +88,7 @@ abstract public class AbstractWidgetRendererExt implements WidgetRenderer {
 		if(snippet==null) {
 			String snippetLocation = SNIPPET_LOCATION + elementType + SNIPPET_EXT;
 			URL entry = WebAppActivatorTest.getContext().getBundle().getEntry(snippetLocation);
+			HubUtility.printDebugMessage(this.toString(), "URL Entry "+entry);
 			if(entry!=null) {
 				try {
 					snippet = IOUtils.toString(entry.openStream());

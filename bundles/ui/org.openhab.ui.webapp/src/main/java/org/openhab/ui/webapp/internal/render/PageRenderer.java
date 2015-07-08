@@ -142,10 +142,10 @@ public class PageRenderer extends AbstractWidgetRenderer {
 				sb_pre.append(new_pre);
 				sb_pre.append(new_post);
 				
-				System.out.println("\n PageRenderer : ProcessChildren Pre : "+sb_pre);
-				System.out.println("\n PageRenderer : ProcessChildren Post: "+sb_post);
+//				System.out.println("\n PageRenderer : ProcessChildren Pre : "+sb_pre);
+//				System.out.println("\n PageRenderer : ProcessChildren Post: "+sb_post);
 			} else {
-				System.out.println("\n PageRenderer : ProcessChildren sb_pre: "+sb_pre);
+//				System.out.println("\n PageRenderer : ProcessChildren sb_pre: "+sb_pre);
 				sb_pre.append(widgetSB);
 			}
 		}
@@ -163,7 +163,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 		for(WidgetRenderer renderer : widgetRenderers) {
 			if(renderer.canRender(w)) {
 				//String ren =	renderer.renderWidget(w, sb)
-				System.out.println("\n Render : "+w + " SB : "+sb.toString());
+//				System.out.println("\n Render : "+w + " SB : "+sb.toString());
 				printContent(w);
 				return renderer.renderWidget(w, sb);
 			}
@@ -182,9 +182,9 @@ public class PageRenderer extends AbstractWidgetRenderer {
 		TreeIterator t	=	 w.eAllContents();
 		while(t.hasNext()){
 			Object o	=	t.next();
-			System.out.println(o);
+//			System.out.println(o);
 		}
 		EList elist	=	w.eContents();
-		System.out.println("\n Elist : "+elist.toString());
+//		System.out.println("\n Elist : "+elist.toString());
 	}
 }

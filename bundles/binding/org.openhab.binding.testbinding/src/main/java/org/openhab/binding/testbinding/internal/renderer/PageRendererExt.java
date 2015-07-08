@@ -3,10 +3,12 @@ package org.openhab.binding.testbinding.internal.renderer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
+import org.openhab.binding.testbinding.common.HubUtility;
 import org.openhab.binding.testbinding.internal.servlet.WebAppServletTest;
 import org.openhab.model.sitemap.Frame;
 import org.openhab.model.sitemap.Sitemap;
@@ -123,10 +125,10 @@ public class PageRendererExt extends AbstractWidgetRendererExt {
 				sb_pre.append(new_pre);
 				sb_pre.append(new_post);
 				
-				System.out.println("\n PageRenderer : ProcessChildren Pre : "+sb_pre);
-				System.out.println("\n PageRenderer : ProcessChildren Post: "+sb_post);
+//				System.out.println("\n PageRenderer : ProcessChildren Pre : "+sb_pre);
+//				System.out.println("\n PageRenderer : ProcessChildren Post: "+sb_post);
 			} else {
-				System.out.println("\n PageRenderer : ProcessChildren sb_pre: "+sb_pre);
+//				System.out.println("\n PageRenderer : ProcessChildren sb_pre: "+sb_pre);
 				sb_pre.append(widgetSB);
 			}
 		}
@@ -144,7 +146,7 @@ public class PageRendererExt extends AbstractWidgetRendererExt {
 		for(WidgetRenderer renderer : widgetRenderers) {
 			if(renderer.canRender(w)) {
 				//String ren =	renderer.renderWidget(w, sb)
-				System.out.println("\n Render : "+w + " SB : "+sb.toString());
+				//System.out.println("\n Render : "+w + " SB : "+sb.toString());
 				printContent(w);
 				return renderer.renderWidget(w, sb);
 			}
@@ -163,10 +165,33 @@ public class PageRendererExt extends AbstractWidgetRendererExt {
 		TreeIterator t	=	 w.eAllContents();
 		while(t.hasNext()){
 			Object o	=	t.next();
-			System.out.println(o);
+			//System.out.println(o);
 		}
 		EList elist	=	w.eContents();
-		System.out.println("\n Elist : "+elist.toString());
+		//System.out.println("\n Elist : "+elist.toString());
 	}
 
+	public StringBuilder processPageCreateProfile(String id, String sitemap, String label, EList<Widget> children, boolean async) throws RenderException {
+		
+		String snippet = getSnippet(async ? "layer" : "createprofile");
+		HubUtility.printDebugMessage(this.toString(), "procrssPageCreaterofile : snippet : "+snippet);
+		snippet = snippet.replaceAll("%id%", id);
+
+		// if the label contains a value span, we remove this span as
+		// the title of a page/layer cannot deal with this
+		// Note: we can have a span here, if the parent widget had a label
+		// with some value defined (e.g. "Windows [%d]"), which getLabel()
+		// will convert into a "Windows <span>5</span>".
+		if(label.contains("[") && label.endsWith("]")) {
+			label = label.replace("[", "").replace("]", "");
+		}
+		snippet = StringUtils.replace(snippet, "%label%", label);
+		snippet = StringUtils.replace(snippet, "%servletname%", "hub/profile");
+		snippet = StringUtils.replace(snippet, "%sitemap%", sitemap);
+		
+//		IOUtils.toString(entry.openStream());
+		
+		return new StringBuilder(snippet);
+	}
+	
 }
