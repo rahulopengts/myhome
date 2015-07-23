@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openhab.core.binding.BindingConfig;
+import org.openhab.core.internal.ItemDataHolder;
 import org.openhab.model.item.binding.BindingConfigParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,10 @@ public class MqttItemConfig implements BindingConfig {
 	 */
 	public MqttItemConfig(String itemName, String bindingConfig) throws BindingConfigParseException {
 
+		System.out.println("\n MqttItemConfig itemName : "+itemName+" bindingConfig : "+bindingConfig+" Instance Is : "+ItemDataHolder.getItemDataHolder());
+		
+		ItemDataHolder.getItemDataHolder().addDataMap(itemName, bindingConfig);
+		
 		String[] configurationStrings = bindingConfig.split("],");
 
 		for (String config : configurationStrings) {

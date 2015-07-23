@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openhab.core.events.EventPublisher;
+import org.openhab.core.internal.ItemDataHolder;
+//import org.openhab.core.internal.ItemDataHolder;
 import org.openhab.ui.webappprofile.internal.common.HubUtility;
 import org.openhab.ui.webappprofile.internal.servlet.evthandler.AdminEventHandler;
 import org.openhab.ui.webappprofile.internal.xml.XMLDocument;
@@ -77,9 +79,11 @@ public class CmdServlet extends BaseServlet {
 	public void service(ServletRequest req, ServletResponse res)
 			throws ServletException, IOException {
 		
-		HubUtility.printDebugMessage(this.toString(), "Got message in hub Command");
+		HubUtility.printDebugMessage(this.toString(), "Got message in hub Command ");
 		
-		AdminEventHandler.handleProfileCreateMode((HttpServletRequest)req,(HttpServletResponse)res,itemRegistry);
+		
+		
+		AdminEventHandler.handleProfileCreateMode((HttpServletRequest)req,(HttpServletResponse)res,itemRegistry,eventPublisher);
 
 	}
 	

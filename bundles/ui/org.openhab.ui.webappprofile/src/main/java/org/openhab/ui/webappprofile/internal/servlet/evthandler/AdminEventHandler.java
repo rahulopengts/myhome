@@ -5,6 +5,8 @@ import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openhab.core.events.EventPublisher;
+import org.openhab.core.internal.ItemDataHolder;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -26,7 +28,7 @@ public class AdminEventHandler {
 	public static void intitializeProfileCreateMode(HttpServletRequest request,HttpServletResponse response){
 		String actionId	=	(String)request.getParameter(HubUtility.CREATE_PROFILE);
 		try{
-			if(actionId!=null && actionId.equals(HubUtility.CREATE_PROFILE)){
+			//if(actionId!=null && actionId.equals(HubUtility.CREATE_PROFILE)){
 				//
 				String profileId	=	request.getParameter("profileId");
 				String profileName	=	request.getParameter("profileName");
@@ -39,24 +41,24 @@ public class AdminEventHandler {
 					request.getSession().setAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION, xmlDocument);
 					request.getSession().setAttribute(HubUtility.APP_MODE, HubUtility.CREATE_PROFILE);
 				}
-			} else {
-				//First check if the profile id is existing
-				Enumeration<String> paramEnum	=	request.getParameterNames();
-				if(paramEnum!=null){
-					while(paramEnum.hasMoreElements()){
-						String parameName	=	paramEnum.nextElement();
-						String paramValue	=	request.getParameter(parameName);
-						HubUtility.printDebugMessage("AdminEvent", " Req Param Name : "+parameName+ ": Req Param Value : "+paramValue);
-					}
-				}
-				
-			}
+//			} else {
+//				//First check if the profile id is existing
+//				Enumeration<String> paramEnum	=	request.getParameterNames();
+//				if(paramEnum!=null){
+//					while(paramEnum.hasMoreElements()){
+//						String parameName	=	paramEnum.nextElement();
+//						String paramValue	=	request.getParameter(parameName);
+//						HubUtility.printDebugMessage("AdminEvent", " Req Param Name : "+parameName+ ": Req Param Value : "+paramValue);
+//					}
+//				}
+//				
+//			}
 		} catch (Exception e){
 			logger.error("Error In handling evenet "+e);
 		}
 	}
 	
-	public static void handleProfileCreateMode(HttpServletRequest req,HttpServletResponse res,ItemRegistry itemRegistry){
+	public static void handleProfileCreateMode(HttpServletRequest req,HttpServletResponse res,ItemRegistry itemRegistry,EventPublisher eventPublisher){
 
 		try{
 			for(Object key : req.getParameterMap().keySet()) {
@@ -69,8 +71,19 @@ public class AdminEventHandler {
 					try {
 						Item item = itemRegistry.getItem(itemName);
 						
+						HubUtility.printDebugMessage("AdminEvent State ", item.getState().toString());
+						
 						HubUtility.printDebugMessage("AdminEvent", "Got message Item Detials "+item.getName() +" : State : "+item.getState()+" : "+item.getGroupNames()+" : "+item.toString());
 						
+						
+						String bindingConfig	=	ItemDataHolder.getItemDataHolder().getData(item.getName());
+						
+						
+						String[] configurationStrings = bindingConfig.split("],");
+						HubUtility.printDebugMessage("AdminEvent-0", configurationStrings[0]);
+						HubUtility.printDebugMessage("AdminEvent-1", configurationStrings[1]);
+						XMLDocument	xmlDocument	=	(XMLDocumentDomImpl)req.getSession().getAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION);
+						HubUtility.printDebugMessage("AdminEvent-DOM OBJECT ",""+xmlDocument);
 						// we need a special treatment for the "TOGGLE" command of switches;
 						// this is no command officially supported and must be translated 
 						// into real commands by the webapp.
@@ -80,7 +93,10 @@ public class AdminEventHandler {
 						
 						Command command = TypeParser.parseCommand(item.getAcceptedCommandTypes(), commandName);
 						if(command!=null) {
-							HubUtility.printDebugMessage("AdminEvent", "ItemName And Command Are : "+itemName+" :: "+commandName);
+							//HubUtility.printDebugMessage("AdminEvent", "ItemName And Command Are : "+itemName+" :: "+commandName);
+							
+							HubUtility.printDebugMessage("AdminEvent", eventPublisher.getClass().getName());
+							eventPublisher.sendCommand(itemName, command);
 
 						} else {
 							logger.warn("Received unknown command '{}' for item '{}'", commandName, itemName);						

@@ -8,10 +8,13 @@
  */
 package org.openhab.binding.mqtt.internal;
 
+import java.awt.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mqtt.MqttBindingProvider;
 import org.openhab.core.binding.BindingChangeListener;
 import org.openhab.core.binding.BindingProvider;
+import org.openhab.core.internal.ItemDataHolder;
 import org.openhab.core.items.Item;
 import org.openhab.io.transport.mqtt.MqttService;
 import org.openhab.model.item.binding.AbstractGenericBindingProvider;
@@ -57,6 +60,9 @@ public class MqttGenericBindingProvider extends AbstractGenericBindingProvider i
 		}
 
 		final MqttItemConfig itemConfig = new MqttItemConfig(itemName, bindingConfig);
+		ItemDataHolder	itemDataHolder	=	ItemDataHolder.getItemDataHolder();
+		System.out.println("\n ItemDataHolder : "+itemDataHolder);
+		System.out.println("\n MQTT Item : "+itemConfig);
 
 		// register all message consumers
 		for (MqttMessageSubscriber subscriber : itemConfig.getMessageSubscribers()) {
@@ -96,6 +102,22 @@ public class MqttGenericBindingProvider extends AbstractGenericBindingProvider i
 			mqttService.registerMessageProducer(publisher.getBroker(), publisher);
 		}
 
+		
+		java.util.List<MqttMessagePublisher> list	=	itemConfig.getMessagePublishers();
+		
+		if(list!=null){
+			int size	=	list.size();
+			for(int i=0;i<size;i++){
+				MqttMessagePublisher	pub	=	(MqttMessagePublisher)list.get(i);
+				
+				System.out.println("\n MqttGenericBindingProvider : Size : "+itemName+ ": Pub : "+pub);
+			}
+			
+		}
+				
+		
+		
+		
 		// add binding change listener to clean up message publishers on item
 		// removal
 		addBindingChangeListener(new BindingChangeListener() {

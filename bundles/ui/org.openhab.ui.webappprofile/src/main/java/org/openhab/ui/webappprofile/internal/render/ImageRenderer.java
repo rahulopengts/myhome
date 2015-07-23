@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.openhab.model.sitemap.Image;
 import org.openhab.model.sitemap.Widget;
+import org.openhab.ui.webappprofile.internal.common.HubUtility;
 import org.openhab.ui.webappprofile.render.RenderException;
 import org.openhab.ui.webappprofile.render.WidgetRenderer;
 
@@ -59,6 +60,7 @@ public class ImageRenderer extends AbstractWidgetRenderer{
 		snippet = StringUtils.replace(snippet, "%url%", url);
 		
 		sb.append(snippet);
+		HubUtility.printDebugMessage(this.toString(), "Snippet is : "+sb.toString());
 		return null;
 	}
 }

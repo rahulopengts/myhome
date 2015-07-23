@@ -53,7 +53,10 @@ public class EventPublisherImpl implements EventPublisher {
 	 */
 	public void sendCommand(String itemName, Command command) {
 		if (command != null) {
-			if(eventAdmin!=null) eventAdmin.sendEvent(createCommandEvent(itemName, command));
+			if(eventAdmin!=null){
+				System.out.println("\n EventPublisheImpl : EventAdmin : "+eventAdmin.getClass().getName());
+				eventAdmin.sendEvent(createCommandEvent(itemName, command));
+			}
 		} else {
 			logger.warn("given command is NULL, couldn't send command to '{}'", itemName);
 		}
@@ -92,6 +95,7 @@ public class EventPublisherImpl implements EventPublisher {
 		Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("item", itemName);
 		properties.put("command", command);
+		System.out.println("\n CreateCommand : itemName "+itemName+" : Command "+command+" Command Object "+command.toString());
 		return new Event(createTopic(EventType.COMMAND, itemName) , properties);
 	}
 

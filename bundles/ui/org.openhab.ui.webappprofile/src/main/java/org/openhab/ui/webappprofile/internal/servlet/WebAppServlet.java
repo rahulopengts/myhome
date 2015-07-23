@@ -370,11 +370,11 @@ public class WebAppServlet extends BaseServlet {
 		if(requestAction!=null && requestAction.equals(HubUtility.CREATE)){
 			HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 1");
 			return 1;
-		} else if(requestAction!=null && requestAction.equals(HubUtility.SUBMIT)){
-			String actionId	=	(String)req.getParameter(HubUtility.CREATE_PROFILE);
-			if(actionId!=null && actionId.equals(HubUtility.CREATE_PROFILE)){
+		} else if(requestAction!=null && requestAction.equals(HubUtility.CREATE_PROFILE)){
+			//String actionId	=	(String)req.getParameter(HubUtility.CREATE_PROFILE);
+			//if(actionId!=null && actionId.equals(HubUtility.CREATE_PROFILE)){
 				AdminEventHandler.intitializeProfileCreateMode(req, res);
-			}
+			//}
 			HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 2");
 			
 			return 2;

@@ -20,6 +20,7 @@ import org.openhab.core.types.State;
 import org.openhab.model.sitemap.Mapping;
 import org.openhab.model.sitemap.Switch;
 import org.openhab.model.sitemap.Widget;
+import org.openhab.ui.webappprofile.internal.common.HubUtility;
 import org.openhab.ui.webappprofile.render.RenderException;
 import org.openhab.ui.webappprofile.render.WidgetRenderer;
 import org.slf4j.Logger;
@@ -72,11 +73,15 @@ public class SwitchRenderer extends AbstractWidgetRenderer {
 
 		String snippet = getSnippet(snippetName);
 
+		State stateIs	=	itemUIRegistry.getState(w);
+		HubUtility.printDebugMessage(this.toString(), "State of widget s "+stateIs.toString());
+		
 		snippet = StringUtils.replace(snippet, "%id%", itemUIRegistry.getWidgetId(w));
 		snippet = StringUtils.replace(snippet, "%icon%", escapeURLPath(itemUIRegistry.getIcon(w)));
 		snippet = StringUtils.replace(snippet, "%item%", w.getItem());
 		snippet = StringUtils.replace(snippet, "%label%", getLabel(w));
 		snippet = StringUtils.replace(snippet, "%servletname%", "hub/profile");
+	
 		
 		State state = itemUIRegistry.getState(w);
 		
@@ -110,6 +115,7 @@ public class SwitchRenderer extends AbstractWidgetRenderer {
 		snippet = processColor(w, snippet);
 
 		sb.append(snippet);
+		HubUtility.printDebugMessage(this.toString(), "Snippet is : "+sb.toString());
 		return null;
 	}
 }
