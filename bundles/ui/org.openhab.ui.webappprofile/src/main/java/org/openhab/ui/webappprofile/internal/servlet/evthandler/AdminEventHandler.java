@@ -30,7 +30,7 @@ public class AdminEventHandler {
 		try{
 			//if(actionId!=null && actionId.equals(HubUtility.CREATE_PROFILE)){
 				//
-				String profileId	=	request.getParameter("profileId");
+				String profileId	=	request.getParameter("profileID");
 				String profileName	=	request.getParameter("profileName");
 				String schTime		=	request.getParameter("schTime");
 				XMLDocument xmlDocument	=	(XMLDocument)request.getSession().getAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION);
@@ -69,21 +69,29 @@ public class AdminEventHandler {
 				if(!itemName.startsWith("__")) { // all additional webapp params start with "__" and should be ignored
 					String commandName = req.getParameter(itemName);
 					try {
+						
 						Item item = itemRegistry.getItem(itemName);
+						
+						String nodeId	=	item.getName();
+						String nodeBinding	=	ItemDataHolder.getItemDataHolder().getData(nodeId);
+						XMLDocument	xmlDocument	=	(XMLDocumentDomImpl)req.getSession().getAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION);
+						HubUtility.printDebugMessage("AdminEvent-DOM OBJECT ",""+xmlDocument);						
+						//xmlDocument.updateDocumentObject(nodeId, nodeBinding);
+						
 						
 						HubUtility.printDebugMessage("AdminEvent State ", item.getState().toString());
 						
 						HubUtility.printDebugMessage("AdminEvent", "Got message Item Detials "+item.getName() +" : State : "+item.getState()+" : "+item.getGroupNames()+" : "+item.toString());
 						
 						
+//*******************************************************************************************************************						
 						String bindingConfig	=	ItemDataHolder.getItemDataHolder().getData(item.getName());
-						
-						
 						String[] configurationStrings = bindingConfig.split("],");
 						HubUtility.printDebugMessage("AdminEvent-0", configurationStrings[0]);
 						HubUtility.printDebugMessage("AdminEvent-1", configurationStrings[1]);
-						XMLDocument	xmlDocument	=	(XMLDocumentDomImpl)req.getSession().getAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION);
-						HubUtility.printDebugMessage("AdminEvent-DOM OBJECT ",""+xmlDocument);
+						
+						
+//*******************************************************************************************************************						
 						// we need a special treatment for the "TOGGLE" command of switches;
 						// this is no command officially supported and must be translated 
 						// into real commands by the webapp.
@@ -94,8 +102,10 @@ public class AdminEventHandler {
 						Command command = TypeParser.parseCommand(item.getAcceptedCommandTypes(), commandName);
 						if(command!=null) {
 							//HubUtility.printDebugMessage("AdminEvent", "ItemName And Command Are : "+itemName+" :: "+commandName);
+						
+							xmlDocument.updateDocumentObject(nodeId,nodeBinding,command.toString(),"type",item);
 							
-							HubUtility.printDebugMessage("AdminEvent", eventPublisher.getClass().getName());
+							HubUtility.printDebugMessage("AdminEvent Command: ", command.toString());
 							eventPublisher.sendCommand(itemName, command);
 
 						} else {
@@ -110,5 +120,9 @@ public class AdminEventHandler {
 			logger.error("Error In handling evenet "+e);
 		}
 	}
-	
+
+	public static void saveProfile(HttpServletRequest req){
+		XMLDocument	xmlDocument	=	(XMLDocumentDomImpl)req.getSession().getAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION);
+		xmlDocument.writeToFile();
+	}
 }

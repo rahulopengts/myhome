@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.emf.common.util.EList;
 import org.openhab.model.sitemap.Widget;
 import org.openhab.ui.items.ItemUIRegistry;
 import org.openhab.ui.webappprofile.internal.WebAppActivator;
@@ -160,5 +161,10 @@ abstract public class AbstractWidgetRenderer implements WidgetRenderer {
 		snippet = StringUtils.replace(snippet, "%valuestyle%", style);
 		
 		return snippet;
+	}
+	
+	public EList<Widget> renderWidget(Widget w, StringBuilder sb,String applicationMode) throws RenderException{
+		HubUtility.printDebugMessage(this.toString(), "Called Super Class renderWidget and now calling child class");
+		return this.renderWidget(w, sb);
 	}
 }

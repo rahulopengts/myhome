@@ -3,6 +3,7 @@ package org.openhab.ui.webappprofile.internal.render;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
@@ -67,10 +68,27 @@ public class PageRenderer extends AbstractWidgetRenderer {
 		} else if(parts.length > 2){
 			logger.error("Snippet '{}' contains multiple %children% sections, but only one is allowed!", async ? "layer" : "main");
 		}
-		//System.out.println("\n pre_children "+pre_children);
+		
+		post_children	=	HubUtility.modifyPostChildren(post_children);
 		return pre_children.append(post_children);
+
 	}
 
+	private StringBuffer addSaveButton(){
+		String buttonSnippet	=	null;
+		try{
+			buttonSnippet	=	getSnippet("button");
+			
+			HubUtility.printDebugMessage(this.toString(), "Button Snippet Is "+buttonSnippet);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		
+		if(buttonSnippet!=null){
+			return new StringBuffer(buttonSnippet);
+		}
+		return new StringBuffer("");
+	}
 	private void processChildren(StringBuilder sb_pre, StringBuilder sb_post,
 			EList<Widget> children) throws RenderException {
 		
@@ -144,7 +162,8 @@ public class PageRenderer extends AbstractWidgetRenderer {
 				//String ren =	renderer.renderWidget(w, sb)
 				//System.out.println("\n Render : "+w + " SB : "+sb.toString());
 				printContent(w);
-				return renderer.renderWidget(w, sb);
+				//return renderer.renderWidget(w, sb);
+				return renderer.renderWidget(w, sb,"edit");
 			}
 		}
 		return null;
@@ -167,7 +186,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 		//System.out.println("\n Elist : "+elist.toString());
 	}
 
-	public StringBuilder processPageCreateProfile(String id, String sitemap, String label, EList<Widget> children, boolean async) throws RenderException {
+	public StringBuilder processProfileMainPage(String id, String sitemap, String label, EList<Widget> children, boolean async) throws RenderException {
 		
 		String snippet = getSnippet(async ? "layer" : "createprofile");
 		HubUtility.printDebugMessage(this.toString(), "procrssPageCreaterofile : snippet : "+snippet);

@@ -35,6 +35,7 @@ import org.openhab.model.sitemap.SitemapProvider;
 import org.openhab.model.sitemap.Widget;
 import org.openhab.ui.webappprofile.internal.common.HubUtility;
 import org.openhab.ui.webappprofile.internal.render.PageRenderer;
+import org.openhab.ui.webappprofile.internal.render.ProfilePageRenderer;
 import org.openhab.ui.webappprofile.internal.servlet.evthandler.AdminEventHandler;
 import org.openhab.ui.webappprofile.render.RenderException;
 import org.osgi.service.http.HttpContext;
@@ -48,7 +49,17 @@ public class WebAppServlet extends BaseServlet {
 	private static final Logger logger = LoggerFactory.getLogger(WebAppServlet.class);
 
 	private PageRenderer pageRenderer;
+
+	private ProfilePageRenderer	profilePageRenderer;
 	
+
+	public ProfilePageRenderer getProfilePageRenderer() {
+		return profilePageRenderer;
+	}
+
+	public void setProfilePageRenderer(ProfilePageRenderer profilePageRenderer) {
+		this.profilePageRenderer = profilePageRenderer;
+	}
 
 	public PageRenderer getPageRenderer() {
 		return pageRenderer;
@@ -110,7 +121,9 @@ public class WebAppServlet extends BaseServlet {
 		System.out.println("\n NEW SERVLET SERVICE :");
 		HttpServletRequest	httpRequest	=	(HttpServletRequest)req;
 		String requestPATH	=	httpRequest.getRequestURI();
-		
+		if(profilePageRenderer!=null){
+			HubUtility.printDebugMessage(this.toString(), "ProfilePageRenderer is not null");
+		}
 		
 		//if(renderer==null){
 			//renderer	=	new PageRenderer();
@@ -133,12 +146,8 @@ public class WebAppServlet extends BaseServlet {
 		
 		Sitemap sitemap = sitemapProvider.getSitemap(sitemapName);
 		
-		int actionID	=	evalRequest((HttpServletRequest)req, (HttpServletResponse)res);
-		System.out.println("\n NEW SERVLET :"+requestPATH+" : "+actionID);
-		
-		
-		
-		
+		int evalId	=	evalRequest((HttpServletRequest)req, (HttpServletResponse)res);
+		System.out.println("\n NEW SERVLET :"+requestPATH+" : "+evalId);
 		
 //**************************
 		//System.out.println(" SitemapNameAA"+sitemapName+" Sitemap-- ");//);
@@ -147,9 +156,11 @@ public class WebAppServlet extends BaseServlet {
 //**************************		
 		
 		try {
-			if(actionID==1){
+			if(evalId!=0){
 				System.out.println("\n RETURN");
-				StringBuilder pageContent	=	pageRenderer.processPageCreateProfile("Home", sitemapName, sitemapName, sitemap.getChildren(), async);
+				
+				//StringBuilder pageContent	=	pageRenderer.processProfileMainPage("Home", sitemapName, sitemapName, sitemap.getChildren(), async);
+				StringBuilder pageContent	=	profilePageRenderer.processProfileMainPage("Home", "", sitemapName,sitemapName,evalId);
 				res.getWriter().append(pageContent);
 				res.getWriter().close();
 				return;
@@ -367,18 +378,21 @@ public class WebAppServlet extends BaseServlet {
 
 			HubUtility.printDebugMessage(this.toString(),"RequestionAction is "+requestAction);
 
-		if(requestAction!=null && requestAction.equals(HubUtility.CREATE)){
-			HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 1");
-			return 1;
-		} else if(requestAction!=null && requestAction.equals(HubUtility.CREATE_PROFILE)){
-			//String actionId	=	(String)req.getParameter(HubUtility.CREATE_PROFILE);
-			//if(actionId!=null && actionId.equals(HubUtility.CREATE_PROFILE)){
+			if(requestAction!=null && requestAction.equals(HubUtility.CREATE)){
+				//Go to createprofile.html
+				HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 1");
+				return 2;
+			} else if(requestAction!=null && requestAction.equals(HubUtility.LIST_PROFILE)){ 
+				//go to mainprofilepage.html
+				return 1;
+			} else if(requestAction!=null && requestAction.equals(HubUtility.CREATE_PROFILE)){
 				AdminEventHandler.intitializeProfileCreateMode(req, res);
-			//}
-			HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 2");
-			
-			return 2;
-		}
+				HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 2");
+				
+				return 0;
+			} else if(requestAction!=null && requestAction.equals(HubUtility.EDIT_PROFILE)){
+				
+			}
 		} catch (Exception e){
 			e.printStackTrace();
 		}

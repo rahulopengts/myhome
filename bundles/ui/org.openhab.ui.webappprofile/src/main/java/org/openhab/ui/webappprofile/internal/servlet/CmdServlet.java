@@ -82,9 +82,12 @@ public class CmdServlet extends BaseServlet {
 		HubUtility.printDebugMessage(this.toString(), "Got message in hub Command ");
 		
 		
-		
-		AdminEventHandler.handleProfileCreateMode((HttpServletRequest)req,(HttpServletResponse)res,itemRegistry,eventPublisher);
-
+		String actionId	=	req.getParameter(HubUtility.HUB_ACTION_PARAM);
+		if(actionId!=null && actionId.equals(HubUtility.SAVE_PROFILE)){
+			AdminEventHandler.saveProfile((HttpServletRequest)req);
+		} else {
+			AdminEventHandler.handleProfileCreateMode((HttpServletRequest)req,(HttpServletResponse)res,itemRegistry,eventPublisher);
+		}
 	}
 	
 

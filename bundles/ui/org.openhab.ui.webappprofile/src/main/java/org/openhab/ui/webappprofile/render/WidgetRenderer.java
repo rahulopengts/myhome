@@ -37,5 +37,8 @@ public interface WidgetRenderer {
 	 * @throws RenderException if an error occurs during rendering
 	 */
 	public EList<Widget> renderWidget(Widget w, StringBuilder sb) throws RenderException;
+	
+	
+	public EList<Widget> renderWidget(Widget w, StringBuilder sb,String applicationMode) throws RenderException;
 
 }

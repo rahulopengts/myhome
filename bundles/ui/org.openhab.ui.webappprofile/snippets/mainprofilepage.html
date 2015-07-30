@@ -1,0 +1,53 @@
+  <head>
+        <meta charset="utf-8">
+        <iinitial-scale=1.0">
+        <title>Create Profile Form</title>
+        <link rel="stylesheet" href="WebApp/Design/profilecss.css">
+        <link href='http://fonts.godasdasogleapis.com/css?family=Nunito:800,800' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="WebApp/Design/profilecss.css">
+    
+<script>
+	function onProfileEdit(profileId){
+		
+	
+	 	document.getElementById("action").value = "editprofile";
+	 	document.getElementById("selectedProfileId").value =	profileId; 
+		document.editprofileform.submit();
+		alert(profileId);
+		alert('done');
+	}
+</script>    
+    
+    </head>
+    <body>
+
+      <form name="editprofileform" action="../hub/profile" method="post">
+      
+<h1>Profiles</h1>
+
+<table id="editprofile">
+
+<tr id="firstrow"><th>Profile Name</th><th>Profile Id</th><th>Time</th><th>Time Schedule</th></tr>
+%children%
+<!--
+<tr><td>SAIT Open</td><td>Calgary</td><td>5</td><td></td></tr>
+
+<tr><td>CALTAF Classic</td><td>Calgary</td><td>1.5</td><td onclick=onProfileEdit('test')>5.00</td></tr>
+
+<tr><td>Calgary Marathon</td><td>Calgary</td><td>21.1</td><td>2:00.00</td></tr>
+
+<tr><td>Zombie Survivor</td><td>Cochrane</td><td>5</td><td>25.00</td></tr>
+
+<tr><td>Run for Women</td><td>Calgary</td><td>5</td><td>20.00</td></tr>
+
+<tr><td>Mother's Day Run</td><td>Calgary</td><td>10</td><td>45.00</td></tr>
+
+<tr><td>Edmonton Marathon</td><td>Edmonton</td><td>21.1</td><td>1:30.00</td></tr>
+-->
+</table>
+	<input type="hidden" id="action" name="action" value="">
+	<input type="hidden" id="selectedProfileId" name="action" value="">
+      </form>
+      
+    </body>
+</html>
