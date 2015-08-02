@@ -37,6 +37,7 @@ import org.openhab.ui.webappprofile.internal.common.HubUtility;
 import org.openhab.ui.webappprofile.internal.render.PageRenderer;
 import org.openhab.ui.webappprofile.internal.render.ProfilePageRenderer;
 import org.openhab.ui.webappprofile.internal.servlet.evthandler.AdminEventHandler;
+import org.openhab.ui.webappprofile.internal.xml.XMLDocumentDomImpl;
 import org.openhab.ui.webappprofile.render.RenderException;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
@@ -166,7 +167,8 @@ public class WebAppServlet extends BaseServlet {
 				return;
 			}
 			
-			
+//			req.getParameter(HubUtility.HUB_ACTION_PARAM);
+//			req.getParameter("selectedProfileId");
 			
 			if(sitemap==null) {
 				throw new RenderException("Sitemap '" + sitemapName + "' could not be found");
@@ -189,7 +191,7 @@ public class WebAppServlet extends BaseServlet {
 					return;
 				}
 				
-				StringBuilder testBuilder	=	pageRenderer.processPage("Home", sitemapName, label, sitemap.getChildren(), async);
+				StringBuilder testBuilder	=	pageRenderer.processPage("Home", sitemapName, label, sitemap.getChildren(), async,req.getParameter(HubUtility.HUB_ACTION_PARAM),req.getParameter("selectedProfileId"),(HttpServletRequest)req);
 				//System.out.println("Chile Size : \n "+ childSize);
 				result.append(testBuilder);
 			} else if(!widgetId.equals("Colorpicker")) {
@@ -212,7 +214,8 @@ public class WebAppServlet extends BaseServlet {
 					}
 					String label = pageRenderer.getItemUIRegistry().getLabel(w);
 					if (label==null) label = "undefined";
-					result.append(pageRenderer.processPage(pageRenderer.getItemUIRegistry().getWidgetId(w), sitemapName, label, children, async));
+					result.append(pageRenderer.processPage(pageRenderer.getItemUIRegistry().getWidgetId(w), sitemapName, label, children, async,req.getParameter(HubUtility.HUB_ACTION_PARAM),req.getParameter("selectedProfileId"),(HttpServletRequest)req));
+				
 				}
 				
 				
@@ -380,18 +383,21 @@ public class WebAppServlet extends BaseServlet {
 
 			if(requestAction!=null && requestAction.equals(HubUtility.CREATE)){
 				//Go to createprofile.html
-				HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 1");
+				HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 2");
 				return 2;
 			} else if(requestAction!=null && requestAction.equals(HubUtility.LIST_PROFILE)){ 
 				//go to mainprofilepage.html
 				return 1;
 			} else if(requestAction!=null && requestAction.equals(HubUtility.CREATE_PROFILE)){
 				AdminEventHandler.intitializeProfileCreateMode(req, res);
-				HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 2");
+				HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 1");
 				
 				return 0;
 			} else if(requestAction!=null && requestAction.equals(HubUtility.EDIT_PROFILE)){
-				
+				HubUtility.printDebugMessage(this.toString(),"Setting Edit Mode : "+req.getParameter("selectedProfileId"));
+				req.getSession().setAttribute(HubUtility.APP_MODE, HubUtility.EDIT_PROFILE);
+				req.getSession().setAttribute("ProfileId", req.getParameter("selectedProfileId"));
+				XMLDocumentDomImpl.readAndUpdateProfileDataIntoMemory((String)req.getParameter("selectedProfileId"));
 			}
 		} catch (Exception e){
 			e.printStackTrace();

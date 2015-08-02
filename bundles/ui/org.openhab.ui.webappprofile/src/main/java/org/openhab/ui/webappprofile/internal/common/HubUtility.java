@@ -1,6 +1,7 @@
 package org.openhab.ui.webappprofile.internal.common;
 
 import org.apache.commons.lang.StringUtils;
+import org.openhab.model.sitemap.Widget;
 
 
 
@@ -51,5 +52,10 @@ public class HubUtility {
 		int indexOfdivTag	=	post_children.indexOf("</div>");
 		post_children.insert(indexOfdivTag+6, saveButton);
 		return post_children;
+	}
+	
+	public static String getIcon(Widget w) {
+		String widgetTypeName = w.eClass().getInstanceTypeName().substring(w.eClass().getInstanceTypeName().lastIndexOf(".")+1);
+		return widgetTypeName;
 	}
 }

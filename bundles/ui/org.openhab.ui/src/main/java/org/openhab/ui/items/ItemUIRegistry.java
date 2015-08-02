@@ -62,6 +62,8 @@ public interface ItemUIRegistry extends ItemRegistry, ItemUIProvider {
 	 */
 	public String getIcon(Widget w);
 
+	//Added for IntelliHub Needs
+	public String getIcon(Widget w,String mode,String profileId,String itemState);
 	/**
 	 * Retrieves the current state of the item of a widget or
 	 * <code>UnDefType.UNDEF</code>.

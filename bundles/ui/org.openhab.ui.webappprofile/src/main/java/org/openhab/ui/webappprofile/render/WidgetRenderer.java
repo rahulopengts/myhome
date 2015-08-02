@@ -8,6 +8,8 @@
  */
 package org.openhab.ui.webappprofile.render;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.eclipse.emf.common.util.EList;
 import org.openhab.model.sitemap.Widget;
 
@@ -39,6 +41,6 @@ public interface WidgetRenderer {
 	public EList<Widget> renderWidget(Widget w, StringBuilder sb) throws RenderException;
 	
 	
-	public EList<Widget> renderWidget(Widget w, StringBuilder sb,String applicationMode) throws RenderException;
+	public EList<Widget> renderWidget(Widget w, StringBuilder sb,String applicationMode,String profileId,HttpServletRequest req) throws RenderException;
 
 }

@@ -3,6 +3,8 @@ package org.openhab.ui.webappprofile.internal.render;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
@@ -41,7 +43,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 	 * @return a string builder with the produced HTML code
 	 * @throws RenderException if an error occurs during the processing
 	 */
-	public StringBuilder processPage(String id, String sitemap, String label, EList<Widget> children, boolean async) throws RenderException {
+	public StringBuilder processPage(String id, String sitemap, String label, EList<Widget> children, boolean async,String appMode,String profileId,HttpServletRequest req) throws RenderException {
 		
 		String snippet = getSnippet(async ? "layer" : "main");
 		snippet = snippet.replaceAll("%id%", id);
@@ -64,11 +66,12 @@ public class PageRenderer extends AbstractWidgetRenderer {
 		StringBuilder post_children = new StringBuilder(parts[1]);
 		
 		if(parts.length==2) {
-			processChildren(pre_children, post_children, children);
+			processChildren(pre_children, post_children, children,appMode,profileId,req);
 		} else if(parts.length > 2){
 			logger.error("Snippet '{}' contains multiple %children% sections, but only one is allowed!", async ? "layer" : "main");
 		}
 		
+		//Adding create Button if required
 		post_children	=	HubUtility.modifyPostChildren(post_children);
 		return pre_children.append(post_children);
 
@@ -90,7 +93,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 		return new StringBuffer("");
 	}
 	private void processChildren(StringBuilder sb_pre, StringBuilder sb_post,
-			EList<Widget> children) throws RenderException {
+			EList<Widget> children,String appMode,String profileId,HttpServletRequest req) throws RenderException {
 		
 		// put a single frame around all children widgets, if there are no explicit frames 
 		if(!children.isEmpty()) {
@@ -117,7 +120,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 			StringBuilder new_pre = new StringBuilder();
 			StringBuilder new_post = new StringBuilder();
 			StringBuilder widgetSB = new StringBuilder();
-			EList<Widget> nextChildren = renderWidget(w, widgetSB);
+			EList<Widget> nextChildren = renderWidget(w, widgetSB,appMode,profileId,req);
 			if(nextChildren!=null) {
 				String[] parts = widgetSB.toString().split("%children%");
 				// no %children% placeholder found or at the end
@@ -135,7 +138,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 					String widgetType = w.eClass().getInstanceTypeName().substring(w.eClass().getInstanceTypeName().lastIndexOf(".")+1);
 					logger.error("Snippet for widget '{}' contains multiple %children% sections, but only one is allowed!", widgetType);
 				}
-				processChildren(new_pre, new_post, nextChildren);
+				processChildren(new_pre, new_post, nextChildren,appMode,profileId,req);
 				sb_pre.append(new_pre);
 				sb_pre.append(new_post);
 				
@@ -163,12 +166,33 @@ public class PageRenderer extends AbstractWidgetRenderer {
 				//System.out.println("\n Render : "+w + " SB : "+sb.toString());
 				printContent(w);
 				//return renderer.renderWidget(w, sb);
-				return renderer.renderWidget(w, sb,"edit");
+				return renderer.renderWidget(w, sb);
 			}
 		}
 		return null;
 	}
 
+	@Override
+	public EList<Widget> renderWidget(Widget w, StringBuilder sb,
+			String applicationMode, String profileId,HttpServletRequest req) throws RenderException {
+		// TODO Auto-generated method stub
+		if(itemUIRegistry.getVisiblity(w) == false)
+			return null;
+
+		for(WidgetRenderer renderer : widgetRenderers) {
+			if(renderer.canRender(w)) {
+				//String ren =	renderer.renderWidget(w, sb)
+				//System.out.println("\n Render : "+w + " SB : "+sb.toString());
+				printContent(w);
+				//return renderer.renderWidget(w, sb);
+				return renderer.renderWidget(w, sb,applicationMode,profileId,req);
+			}
+		}
+		return null;
+		
+	}
+	
+	
 	/**
 	 * {@inheritDoc}
 	 */

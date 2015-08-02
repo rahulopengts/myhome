@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.openhab.core.internal.ItemDataHolder;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
@@ -369,6 +370,7 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 			}
 		}
 
+		System.out.println("\n Item :icon: "+icon);
 		// now add the state, if the string does not already contain a state
 		// information
 		if(!icon.contains("-")) {
@@ -414,6 +416,7 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 		if(itemName!=null) {
 			try {
 				Item item = getItem(itemName);
+				System.out.println("\n ItemUIRegisttryImpl Item Class Type "+item.getClass());
 				return item.getState();
 			} catch (ItemNotFoundException e) {
 				logger.error("Cannot retrieve item '{}' for widget {}", new String[] { itemName, w.eClass().getInstanceTypeName() });
@@ -422,6 +425,22 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 		return UnDefType.UNDEF;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public State getProfileState(Widget w,String mode,String profileId,String itemState) {
+		String itemName = w.getItem();
+		if(itemName!=null) {
+			try {
+				Item item = getItem(itemName);
+				System.out.println("\n ItemUIRegisttryImpl Item Class Type "+item.getClass());
+				return item.getState();
+			} catch (ItemNotFoundException e) {
+				logger.error("Cannot retrieve item '{}' for widget {}", new String[] { itemName, w.eClass().getInstanceTypeName() });
+			}
+		}
+		return UnDefType.UNDEF;
+	}
 	
 	/**
 	 * {@inheritDoc}
@@ -926,6 +945,88 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 
 		public String toString() {
 			return this.value;
+		}
+	}
+	
+	public String getIcon(Widget w,String mode,String profileId,String itemProfileBinding){
+		if(mode==null || mode.equals("")){
+			return getIcon(w);
+		} else {
+			String widgetTypeName = w.eClass().getInstanceTypeName().substring(w.eClass().getInstanceTypeName().lastIndexOf(".")+1);
+			
+			// the default is the widget type name, e.g. "switch"
+			String icon = widgetTypeName.toLowerCase();
+			
+			// if an icon is defined for the widget, use it
+			if(w.getIcon()!=null) {
+				icon = w.getIcon();
+			} else {
+				// otherwise check if any item ui provider provides an icon for this item			
+				String itemName = w.getItem();
+				if(itemName!=null) {
+					String result = getIcon(itemName);
+					if(result!=null) icon = result;
+				}
+			}
+
+			System.out.println("\n Item :icon: "+icon);
+			// now add the state, if the string does not already contain a state
+			// information
+			if(!icon.contains("-")) {
+				//Object state = getProfileState(w,String mode,String profileId,String itemState)
+				Object state = getState(w);
+				String itemType	=	null;
+				if(itemProfileBinding!=null){
+					
+				
+				itemType	=	itemProfileBinding.substring(itemProfileBinding.indexOf("~")+1, itemProfileBinding.length());
+				System.out.println("\n SwitchItem Type : "+itemType+":: "+w.getItem().toString());
+				if(itemType.equals("SwitchItem")){
+					System.out.println("\n SwitchItem Type with b "+itemProfileBinding);
+					if(itemProfileBinding.contains("ON")){
+						System.out.println("\n SwitchItem ON ");
+						icon += "-" + "ON".toLowerCase();
+					} else {
+						System.out.println("\n SwitchItem OFF ");
+						icon += "-" + "OFF".toLowerCase();	
+					}
+					return icon;
+				}
+				} else {
+					icon += "-" + "OFF".toLowerCase();
+					return icon;
+				}
+				if(!state.equals(UnDefType.UNDEF)) {
+					if(state instanceof PercentType) {
+						// we do a special treatment for percent types; we try to find the icon of the biggest value
+						// that is still smaller or equal to the current state. 
+						// Example: if there are icons *-0.png, *-50.png and *-100.png, we choose *-0.png, if the state
+						// is 40, and *-50.png, if the state is 70.
+						int iconState = ((PercentType) state).toBigDecimal().intValue();
+						String testIcon;
+						do {
+							testIcon = icon + "-" + String.valueOf(iconState--);
+						} while(!iconExists(testIcon) && iconState>=0);
+						icon = testIcon;
+					} else {
+						// for all other types, just add the string representation of the state
+						icon += "-" + state.toString().toLowerCase();
+					}
+				}
+			}
+			
+			// if the icon contains a status part, but does not exist, return the icon without status
+			if(iconExists(icon) || !icon.contains("-")) {
+				return icon;
+			} else {
+				icon = icon.substring(0, icon.indexOf("-"));
+				if(iconExists(icon)) {
+					return icon;
+				} else {
+					// see http://code.google.com/p/openhab/issues/detail?id=63
+					return ICON_NONE;
+				}
+			}
 		}
 	}
 }

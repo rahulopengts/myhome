@@ -11,6 +11,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.openhab.core.internal.ItemDataHolder;
 import org.openhab.core.items.Item;
 import org.openhab.ui.webappprofile.internal.common.HubUtility;
 import org.w3c.dom.Attr;
@@ -256,8 +257,8 @@ public class XMLDocumentDomImpl implements XMLDocument {
 	}
 	
 
-	  public static void readXML(String fileName) {
-		  HashMap<String, String> profileDataMap	=	new HashMap<String, String>();
+	  public static void readAndUpdateProfileDataIntoMemory(String fileName) {
+		  HashMap<String, String> profileDataMap	=	null;
 		  
 		  try {
 	    	
@@ -270,42 +271,26 @@ public class XMLDocumentDomImpl implements XMLDocument {
 	 
 		//optional, but recommended
 		//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-			doc.getDocumentElement().normalize();
-		 
+			doc.getDocumentElement().normalize();		 
 			System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-		 
 			NodeList nList = doc.getElementsByTagName("profileId");
-		 
-			System.out.println("----------------------------");
-	 
 			for (int temp = 0; temp < nList.getLength(); temp++) {
-		 
 				Node nNode = nList.item(temp);
-		 
-				System.out.println("\nCurrent Element :" + nNode.getNodeName());
-				
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-		 
 					Element eElement = (Element) nNode;
-		 
 					System.out.println("Profile id : " + eElement.getAttribute("profileId"));
 					NodeList	profileNodeChild	=	eElement.getChildNodes();
 					for(int nodeIndex=0;nodeIndex<profileNodeChild.getLength();nodeIndex++){
 						Node profileIdChildNode	=	profileNodeChild.item(nodeIndex);
-						
 						if (profileIdChildNode.getNodeType() == Node.ELEMENT_NODE) {
 							Element profileIdChildElement = (Element) profileIdChildNode;
-							processProfileDataMap(profileIdChildElement);
+							profileDataMap	=	processProfileDataMap(profileIdChildElement);
+							ItemDataHolder.getItemDataHolder().setProfileDataMap(profileDataMap);
 							System.out.println("\nCurrent Profile Element :" + profileIdChildElement.getNodeName());
 							//This will have all child of profileId such as ProfileName, SwitchOn,SwitchOff,SwitchItem etc.
 							
 						}
 					}
-//					System.out.println("First Name : " + eElement.getElementsByTagName("firstname").item(0).getTextContent());
-//					System.out.println("Last Name : " + eElement.getElementsByTagName("lastname").item(0).getTextContent());
-//					System.out.println("Nick Name : " + eElement.getElementsByTagName("nickname").item(0).getTextContent());
-//					System.out.println("Salary : " + eElement.getElementsByTagName("salary").item(0).getTextContent());
-		 
 				}
 			}
 	    } catch (Exception e) {
@@ -313,17 +298,21 @@ public class XMLDocumentDomImpl implements XMLDocument {
 	    }
 	  }
 	 
-	  public static HashMap<String, String> processProfileDataMap(Element rootElement){
+	  private static HashMap<String, String> processProfileDataMap(Element rootElement){
+		  	HashMap	profileDataMap	=	new HashMap<String, String>();
 			NodeList	profileNodeChild	=	rootElement.getChildNodes();
+			String nodeTypeName	=	rootElement.getNodeName();
+			
 			for(int nodeIndex=0;nodeIndex<profileNodeChild.getLength();nodeIndex++){
 				Node profileIdChildNode	=	profileNodeChild.item(nodeIndex);
 				
+				profileDataMap.put(profileIdChildNode.getNodeName(), profileIdChildNode.getTextContent()+"~"+nodeTypeName);
 				
 				HubUtility.printDebugMessage("XMLDocumentDomImpl", " Node Name "+profileIdChildNode.getNodeName());
-				HubUtility.printDebugMessage("XMLDocumentDomImpl", " Node Value"+profileIdChildNode.getTextContent());
+				HubUtility.printDebugMessage("XMLDocumentDomImpl", " Node Value"+profileIdChildNode.getTextContent()+"~"+nodeTypeName);
 			}		  
 		  
-		  return null;
+		  return profileDataMap;
 	  }
 		public static void main(String str[]){
 			try{
@@ -339,7 +328,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
 				
 				
 				XMLDocumentDomImpl x	=	new XMLDocumentDomImpl();
-				XMLDocumentDomImpl.readXML("eve");
+				XMLDocumentDomImpl.readAndUpdateProfileDataIntoMemory("eve");
 				/*
 				x.initDocument();
 				x.createDocument("morning","morning");

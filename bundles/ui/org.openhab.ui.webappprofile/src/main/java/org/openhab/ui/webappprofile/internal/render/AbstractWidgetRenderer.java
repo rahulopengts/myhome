@@ -15,6 +15,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
@@ -163,7 +165,7 @@ abstract public class AbstractWidgetRenderer implements WidgetRenderer {
 		return snippet;
 	}
 	
-	public EList<Widget> renderWidget(Widget w, StringBuilder sb,String applicationMode) throws RenderException{
+	public EList<Widget> renderWidget(Widget w, StringBuilder sb,String applicationMode,String profileId,HttpServletRequest req) throws RenderException{
 		HubUtility.printDebugMessage(this.toString(), "Called Super Class renderWidget and now calling child class");
 		return this.renderWidget(w, sb);
 	}

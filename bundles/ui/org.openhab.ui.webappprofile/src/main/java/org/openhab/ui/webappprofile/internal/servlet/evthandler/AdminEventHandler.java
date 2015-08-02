@@ -106,7 +106,7 @@ public class AdminEventHandler {
 							xmlDocument.updateDocumentObject(nodeId,nodeBinding,command.toString(),"type",item);
 							
 							HubUtility.printDebugMessage("AdminEvent Command: ", command.toString());
-							eventPublisher.sendCommand(itemName, command);
+							//eventPublisher.sendCommand(itemName, command);
 
 						} else {
 							logger.warn("Received unknown command '{}' for item '{}'", commandName, itemName);						
