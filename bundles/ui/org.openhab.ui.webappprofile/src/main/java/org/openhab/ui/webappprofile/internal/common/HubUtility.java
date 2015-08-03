@@ -1,6 +1,9 @@
 package org.openhab.ui.webappprofile.internal.common;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
+import org.openhab.core.internal.ItemDataHolder;
 import org.openhab.model.sitemap.Widget;
 
 
@@ -34,6 +37,7 @@ public class HubUtility {
 	public static String HUB_CMD_EVENT_URI	= "../hub/event";
 	
 	public static String SAVE_PROFILE	=	"saveprofile";
+
 	
 	public static String PROFILEDIR	=	"profiles";
 	
@@ -43,19 +47,44 @@ public class HubUtility {
 		}
 	}
 	
-	public static StringBuilder modifyPostChildren(StringBuilder post_children){
+	public static StringBuilder modifyPostChildren(HttpServletRequest request,StringBuilder post_children){
+		String appMode	=	(String)request.getSession().getAttribute(HubUtility.APP_MODE);
 		
-		String formSubmit	=	"'"+HUB_CMD_EVENT_URI+"?action="+SAVE_PROFILE+"'";
-		
-		StringBuffer saveButton	=	new StringBuffer("<div class=\"button\"><button type=\"submit\" onclick=\"OH.saveProfile("+formSubmit+")\">Create</button></div>");
-		
-		int indexOfdivTag	=	post_children.indexOf("</div>");
-		post_children.insert(indexOfdivTag+6, saveButton);
+		if(appMode!=null && appMode.equals(HubUtility.CREATE_PROFILE)){
+				
+			
+			String formSubmit	=	"'"+HUB_CMD_EVENT_URI+"?action="+SAVE_PROFILE+"'";
+			
+			StringBuffer saveButton	=	new StringBuffer("<div class=\"button\"><button type=\"submit\" onclick=\"OH.saveProfile("+formSubmit+")\">Create</button></div>");
+			
+			int indexOfdivTag	=	post_children.indexOf("</div>");
+			post_children.insert(indexOfdivTag+6, saveButton);
+		} else if(appMode!=null && appMode.equals(HubUtility.EDIT_PROFILE)) {
+			String formSubmit	=	"'"+HUB_CMD_EVENT_URI+"?action="+EDIT_PROFILE+"'";
+			
+			StringBuffer saveButton	=	new StringBuffer("<div class=\"button\"><button type=\"submit\" onclick=\"OH.saveProfile("+formSubmit+")\">Create</button></div>");
+			
+			int indexOfdivTag	=	post_children.indexOf("</div>");
+			post_children.insert(indexOfdivTag+6, saveButton);
+			
+		}
 		return post_children;
 	}
 	
 	public static String getIcon(Widget w) {
 		String widgetTypeName = w.eClass().getInstanceTypeName().substring(w.eClass().getInstanceTypeName().lastIndexOf(".")+1);
 		return widgetTypeName;
+	}
+	
+	public static void updateHttpSessionForNewProfile(HttpServletRequest req,String applicationMode,String profileId){
+		req.getSession().setAttribute(HubUtility.APP_MODE, applicationMode);
+		req.getSession().setAttribute("ProfileId", profileId);
+	}
+	
+	public static void cleanHttpSessionForNewProfile(HttpServletRequest req){
+		req.getSession().removeAttribute(HubUtility.APP_MODE);
+		req.getSession().removeAttribute("ProfileId");
+		req.getSession().removeAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION);
+		ItemDataHolder.getItemDataHolder().setProfileDataMap(null);
 	}
 }

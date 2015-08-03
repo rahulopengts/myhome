@@ -3,6 +3,7 @@ package org.openhab.ui.webappprofile.internal.xml;
 import java.io.File;
 import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -32,6 +33,16 @@ public class XMLDocumentDomImpl implements XMLDocument {
 			docFactory = DocumentBuilderFactory.newInstance();
 			docBuilder = docFactory.newDocumentBuilder();
 			doc = docBuilder.newDocument();
+		} catch (Exception e){
+			throw e;
+		}
+	}
+
+	public void initEditDocument() throws Exception{
+		try{
+			docFactory = DocumentBuilderFactory.newInstance();
+			docBuilder = docFactory.newDocumentBuilder();
+			
 		} catch (Exception e){
 			throw e;
 		}
@@ -130,45 +141,74 @@ public class XMLDocumentDomImpl implements XMLDocument {
 		  }		
 	}
 	
-	public boolean addChileNode(String parentNode,String chileNode,String chiledNodeValue){
-		NodeList	nodeList	=	doc.getElementsByTagName(parentNode);
+	public boolean addChileNode(String strParentNode,String chileNode,String chiledNodeValue){
+		NodeList	nodeList	=	doc.getElementsByTagName(strParentNode);
+		HubUtility.printDebugMessage(this.toString(), "addChileNode : chileNode       : "+chileNode);
+		HubUtility.printDebugMessage(this.toString(), "addChileNode : chiledNodeValue : "+chiledNodeValue);
+		HashMap<String, String> profileDataMap	=	null;
 		if(nodeList!=null && nodeList.getLength()>0){
-		
+			//First check if child node is existing.
+			
 			Element test1 = doc.createElement(chileNode);
+			Node	parentNode	=	nodeList.item(0);
+			Element	parentNodeElement	=	(Element)parentNode;
 			
-			Element	node	=	(Element)nodeList.item(0);
+			NodeList childElementNode	=	parentNodeElement.getElementsByTagName(chileNode);
+			if(childElementNode!=null && childElementNode.getLength()>0){
+				HubUtility.printDebugMessage(this.toString(), "Chile is existing");
+			}
 			
-			node.appendChild(test1);
+			//isChildNodeExisting(parentNode.getN,chileNode);
 			
-//			Element childNode = doc.createElement(chileNode);
-//			test1.appendChild(childNode);
-
+			parentNodeElement.appendChild(test1);
 			test1.setTextContent(chiledNodeValue);
-			
-			
+			if(ItemDataHolder.getItemDataHolder().getProfileDataMap()==null){
+				profileDataMap	=	new HashMap<String, String>();
+				ItemDataHolder.getItemDataHolder().setProfileDataMap(profileDataMap);
+			} else {
+				profileDataMap	=	ItemDataHolder.getItemDataHolder().getProfileDataMap();
+			}
+			profileDataMap.put(chileNode, chiledNodeValue+"~"+parentNode);
 		} else {
 			//NOT IN NODE . ADD THIS NODE
 			Element rootElement	=	doc.getDocumentElement();
-			Element newParentNode = doc.createElement(parentNode);
+			Element newParentNode = doc.createElement(strParentNode);
 			rootElement.appendChild(newParentNode);
-		
 			// set attribute to staff element
 			Attr attrswitchoff = doc.createAttribute("id");
 			attrswitchoff.setValue("1");
 			newParentNode.setAttributeNode(attrswitchoff);
-			
-
 			Element childNode = doc.createElement(chileNode);
 			newParentNode.appendChild(childNode);
-
 			childNode.setTextContent(chiledNodeValue);
 			//
-			
+			if(ItemDataHolder.getItemDataHolder().getProfileDataMap()==null){
+				profileDataMap	=	new HashMap<String, String>();
+				ItemDataHolder.getItemDataHolder().setProfileDataMap(profileDataMap);
+			} else {
+				profileDataMap	=	ItemDataHolder.getItemDataHolder().getProfileDataMap();
+			}
+			profileDataMap.put(chileNode, chiledNodeValue+"~"+strParentNode);
 		}
+		ItemDataHolder.getItemDataHolder().setProfileDataMap(profileDataMap);
 		return true;
 		
 	}
 	
+	private boolean isChildNodeExisting(NodeList nodeList,String chileNodeName){
+		if(nodeList!=null){
+			for(int nodeIndex	=	0	;nodeIndex<nodeList.getLength();nodeIndex++){
+				Node childNode	=	nodeList.item(nodeIndex);
+				
+				HubUtility.printDebugMessage(this.toString(), "Checking Existing Node for "+"chileNodeName with" + childNode.getNodeName());
+				if(childNode.getNodeName().equals(chileNodeName)){
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 	public static File[] getProfileList(){
 		
 		String dirLocation	=	System.getenv("ECLIPSEHOME")+File.separator+HubUtility.PROFILEDIR;//+File.separator+profileId+".xml";
@@ -223,6 +263,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
 		} catch (TransformerException e){
 			e.printStackTrace();
 		}
+	
 	}
 	
 	public void updateDocumentObject(String nodeId,String nodeBinding,String nodeState, String nodeType,Item item){
@@ -257,17 +298,22 @@ public class XMLDocumentDomImpl implements XMLDocument {
 	}
 	
 
-	  public static void readAndUpdateProfileDataIntoMemory(String fileName) {
+	  public void readAndUpdateProfileDataIntoMemory(HttpServletRequest req,String fileName) {
 		  HashMap<String, String> profileDataMap	=	null;
-		  
+		  boolean isSuccess	=	false;
 		  try {
 	    	
 			String fileLocation	=	System.getenv("ECLIPSEHOME")+File.separator+HubUtility.PROFILEDIR+File.separator+fileName+".xml";
 			
 			File fXmlFile = new File(fileLocation);
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
+			
+//			DocumentBuilderFactory docFactory = null;
+//			DocumentBuilder docBuilder = null;
+//			Document doc = null;
+			
+//			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			doc = docBuilder.parse(fXmlFile);
 	 
 		//optional, but recommended
 		//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
@@ -286,6 +332,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
 							Element profileIdChildElement = (Element) profileIdChildNode;
 							profileDataMap	=	processProfileDataMap(profileIdChildElement);
 							ItemDataHolder.getItemDataHolder().setProfileDataMap(profileDataMap);
+							isSuccess	=	true;
 							System.out.println("\nCurrent Profile Element :" + profileIdChildElement.getNodeName());
 							//This will have all child of profileId such as ProfileName, SwitchOn,SwitchOff,SwitchItem etc.
 							
@@ -296,6 +343,9 @@ public class XMLDocumentDomImpl implements XMLDocument {
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    }
+		if(isSuccess){
+			//HubUtility.cleanHttpSessionForNewProfile(req);
+		}
 	  }
 	 
 	  private static HashMap<String, String> processProfileDataMap(Element rootElement){
@@ -328,7 +378,8 @@ public class XMLDocumentDomImpl implements XMLDocument {
 				
 				
 				XMLDocumentDomImpl x	=	new XMLDocumentDomImpl();
-				XMLDocumentDomImpl.readAndUpdateProfileDataIntoMemory("eve");
+				x.initEditDocument();
+				x.readAndUpdateProfileDataIntoMemory(null,"eve");
 				/*
 				x.initDocument();
 				x.createDocument("morning","morning");

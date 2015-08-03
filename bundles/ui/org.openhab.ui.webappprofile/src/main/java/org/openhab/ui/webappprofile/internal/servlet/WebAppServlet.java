@@ -383,21 +383,27 @@ public class WebAppServlet extends BaseServlet {
 
 			if(requestAction!=null && requestAction.equals(HubUtility.CREATE)){
 				//Go to createprofile.html
+				HubUtility.cleanHttpSessionForNewProfile(req);
+				
 				HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 2");
 				return 2;
 			} else if(requestAction!=null && requestAction.equals(HubUtility.LIST_PROFILE)){ 
 				//go to mainprofilepage.html
 				return 1;
 			} else if(requestAction!=null && requestAction.equals(HubUtility.CREATE_PROFILE)){
+				//Submitted page createprofile.html
 				AdminEventHandler.intitializeProfileCreateMode(req, res);
 				HubUtility.printDebugMessage(this.toString(),"Requestion from evalRequest is 1");
-				
+				String profileId	=	req.getParameter("profileID");
+				HubUtility.updateHttpSessionForNewProfile(req,HubUtility.CREATE_PROFILE,profileId);
 				return 0;
 			} else if(requestAction!=null && requestAction.equals(HubUtility.EDIT_PROFILE)){
 				HubUtility.printDebugMessage(this.toString(),"Setting Edit Mode : "+req.getParameter("selectedProfileId"));
-				req.getSession().setAttribute(HubUtility.APP_MODE, HubUtility.EDIT_PROFILE);
-				req.getSession().setAttribute("ProfileId", req.getParameter("selectedProfileId"));
-				XMLDocumentDomImpl.readAndUpdateProfileDataIntoMemory((String)req.getParameter("selectedProfileId"));
+				HubUtility.updateHttpSessionForNewProfile(req,HubUtility.EDIT_PROFILE,(String)req.getParameter("selectedProfileId"));
+				XMLDocumentDomImpl	xmlDocument	=	new XMLDocumentDomImpl();
+				xmlDocument.initEditDocument();
+				xmlDocument.readAndUpdateProfileDataIntoMemory(req,(String)req.getParameter("selectedProfileId"));				
+				req.getSession().setAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION,xmlDocument);
 			}
 		} catch (Exception e){
 			e.printStackTrace();

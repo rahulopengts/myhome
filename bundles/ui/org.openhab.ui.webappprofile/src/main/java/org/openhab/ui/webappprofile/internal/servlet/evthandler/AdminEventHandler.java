@@ -33,6 +33,7 @@ public class AdminEventHandler {
 				String profileId	=	request.getParameter("profileID");
 				String profileName	=	request.getParameter("profileName");
 				String schTime		=	request.getParameter("schTime");
+				HubUtility.cleanHttpSessionForNewProfile(request);
 				XMLDocument xmlDocument	=	(XMLDocument)request.getSession().getAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION);
 				if(xmlDocument==null){
 					xmlDocument	=	new XMLDocumentDomImpl();
@@ -53,6 +54,8 @@ public class AdminEventHandler {
 //				}
 //				
 //			}
+			
+			HubUtility.updateHttpSessionForNewProfile(request,HubUtility.CREATE_PROFILE,profileId);
 		} catch (Exception e){
 			logger.error("Error In handling evenet "+e);
 		}
@@ -117,6 +120,7 @@ public class AdminEventHandler {
 				}
 			}
 		} catch (Exception e){
+			e.printStackTrace();
 			logger.error("Error In handling evenet "+e);
 		}
 	}

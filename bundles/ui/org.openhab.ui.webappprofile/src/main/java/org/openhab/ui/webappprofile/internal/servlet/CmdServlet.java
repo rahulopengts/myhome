@@ -85,7 +85,10 @@ public class CmdServlet extends BaseServlet {
 		String actionId	=	req.getParameter(HubUtility.HUB_ACTION_PARAM);
 		if(actionId!=null && actionId.equals(HubUtility.SAVE_PROFILE)){
 			AdminEventHandler.saveProfile((HttpServletRequest)req);
+			HubUtility.cleanHttpSessionForNewProfile((HttpServletRequest)req);
 		} else {
+
+
 			AdminEventHandler.handleProfileCreateMode((HttpServletRequest)req,(HttpServletResponse)res,itemRegistry,eventPublisher);
 		}
 	}

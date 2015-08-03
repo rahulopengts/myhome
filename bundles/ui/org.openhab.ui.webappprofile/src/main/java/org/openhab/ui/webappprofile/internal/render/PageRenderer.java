@@ -69,10 +69,9 @@ public class PageRenderer extends AbstractWidgetRenderer {
 			processChildren(pre_children, post_children, children,appMode,profileId,req);
 		} else if(parts.length > 2){
 			logger.error("Snippet '{}' contains multiple %children% sections, but only one is allowed!", async ? "layer" : "main");
-		}
-		
+		}		
 		//Adding create Button if required
-		post_children	=	HubUtility.modifyPostChildren(post_children);
+		post_children	=	HubUtility.modifyPostChildren(req,post_children);
 		return pre_children.append(post_children);
 
 	}
