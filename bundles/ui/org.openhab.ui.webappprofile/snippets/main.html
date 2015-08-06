@@ -25,6 +25,7 @@
 		<script src="jquery.min.js"></script>
 		<script src="jquery.miniColors.js"></script>
 
+ 
 		<script>
       WA.AddEventListener("endasync", function (evt) {
         var hash = document.location.hash.substring(2);
@@ -145,28 +146,40 @@
 
       OH.saveProfile = function saveProfile(action) {
       	alert(action);
-      	WA.Request(action, null, null);
-        
+      	WA.Request(action, null, -1,true,null);
+      	window.open('/hub/profile?action=listprofile',"_self");
+
       };
+
 
     </script>
 
 	</head>
 	<body -dir="rtl">
+
+
 	  <div id="WebApp">
 		<div id="iPL"></div>
 		<div id="iLoader"><span>Loading...</span></div>
 
+	
+<header>
+    <figure>
+        <img src="/images/logo.gif" alt="Logo" />
+    </figure>
+</header>
+	
 		<div id="iHeader">
 			<a href="#" id="waBackButton">Back</a>
 			<a href="#" id="waHomeButton">Home</a>
+			
 			<a href="#" onclick="return WA.HideBar()"><span id="waHeadTitle">%label%</span></a>
 		</div>
 
 		<div id="iGroup">
 			<div class="iLayer" id="wa%id%" title="%id%">
 					%children%				
-				<div class="iFooter">&copy;2010-2014 IntelliZone.com</div>
+				<div class="iFooter">&copy;2010-2015 IntelliZones.in</div>
 			</div>
 			<div class="iLayer" id="waColorpicker" title="Color">
 				<div class="iMenu"><h3></h3>

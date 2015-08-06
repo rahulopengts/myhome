@@ -1,7 +1,7 @@
 html{-webkit-text-size-adjust:none;-webkit-touch-callout:none;height:100%}
 *:not(input):not(textarea):not(select),input[type=image],input[type=file],input[type=submit],input[type=button],input[type=reset]{-webkit-user-select: none}
 body *{text-overflow:ellipsis;font-family:helvetica,arial,sans-serif;-webkit-tap-highlight-color:rgba(0,0,0,0);z-index:0}
-body{margin:0;color:#000;background:#aebac2 url(Img/bg.png);height:100%;-webkit-transform:translateX(0);-webkit-transform:translate3d(0,0,0)}
+body{margin:0;color:#000;background:#aaaacc url(Img/bg.png);height:100%;-webkit-transform:translateX(0);-webkit-transform:translate3d(0,0,0)}
 img{border:0}
 a[rel=action],a[rel=back]{display:none}
 #WebApp{min-height:100%;width:100%}
@@ -129,7 +129,7 @@ li.iRadio a label{display:none}
 #iHeader > div,#waHeadTitle{display:none;-webkit-transform:translateX(0);-webkit-transform:translate3d(0,0,0);position:absolute;width:100%;top:0;bottom:0;left:0}
 .__ani #iGroup .iLayer,.__ani #iHeader #waHeadTitle{-webkit-transition-property:-webkit-transform;-webkit-transition-duration:0.35s}
 .__ani #iHeader > div{-webkit-transition-property:-webkit-transform,opacity;-webkit-transition-duration: 0.35s,0.35s}
-.iFooter{text-align:center;margin:10px 0;clear:both;width:100%;color:#4c566c;font-size:14px;font-weight:bold;text-shadow:#fff 0 1px 0}
+.ifer{text-align:center;margin:10px 0;clear:both;width:100%;color:#4c566c;font-size:14px;font-weight:bold;text-shadow:#fff 0 1px 0}
 .iMenu,.iPanel,.iInner{margin:9px 9px 20px}
 .iShop li img.iFull{margin:-11px 6px -12px -8px;width:88px;height:88px;background:#d6dce6 url(Img/bg-shop.png) top left repeat-x}
 .iList .iShop li img.iFull{margin:-10px 6px 0 -10px;height:83px}

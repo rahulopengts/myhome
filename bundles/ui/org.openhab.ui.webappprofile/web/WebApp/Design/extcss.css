@@ -12,7 +12,7 @@ body {
 }
 
 form {
-  max-width: 300px;
+  max-width: 100%;
   margin: 10px auto;
   padding: 10px 20px;
   background: #f4f7f8;
@@ -111,8 +111,9 @@ label.light {
   border-radius: 100%;
 }
 
-@media screen and (min-width: 480px) {
+@media screen and (min-width: 100%) {
   form {
-    max-width: 480px;
+    max-width: 100%;
   }
 }
+

@@ -9,5 +9,5 @@ public interface XMLDocument {
 	public void initDocument() throws Exception;
 	public void updateDocumentObject(String nodeId,String nodeBinding,String nodeState, String nodeType,Item item);
 	public void writeToFile();
-	
+	public void updateToFile();	
 }

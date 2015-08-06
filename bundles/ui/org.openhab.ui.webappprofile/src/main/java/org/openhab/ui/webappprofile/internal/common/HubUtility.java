@@ -1,9 +1,11 @@
 package org.openhab.ui.webappprofile.internal.common;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.openhab.core.internal.ItemDataHolder;
+import org.openhab.core.items.ItemRegistry;
 import org.openhab.model.sitemap.Widget;
 
 
@@ -51,22 +53,16 @@ public class HubUtility {
 		String appMode	=	(String)request.getSession().getAttribute(HubUtility.APP_MODE);
 		
 		if(appMode!=null && appMode.equals(HubUtility.CREATE_PROFILE)){
-				
-			
 			String formSubmit	=	"'"+HUB_CMD_EVENT_URI+"?action="+SAVE_PROFILE+"'";
-			
-			StringBuffer saveButton	=	new StringBuffer("<div class=\"button\"><button type=\"submit\" onclick=\"OH.saveProfile("+formSubmit+")\">Create</button></div>");
-			
+			StringBuffer saveButton	=	new StringBuffer("<div style=\"padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;\"><button type=\"submit\" onclick=\"OH.saveProfile("+formSubmit+")\">Save Profile</button></div>");			
+			//StringBuffer saveButton	=	new StringBuffer("<div class=\"button\"><button type=\"submit\" onclick=\"OH.saveProfile("+formSubmit+")\">Save Profile</button></div>");
 			int indexOfdivTag	=	post_children.indexOf("</div>");
 			post_children.insert(indexOfdivTag+6, saveButton);
 		} else if(appMode!=null && appMode.equals(HubUtility.EDIT_PROFILE)) {
 			String formSubmit	=	"'"+HUB_CMD_EVENT_URI+"?action="+EDIT_PROFILE+"'";
-			
-			StringBuffer saveButton	=	new StringBuffer("<div class=\"button\"><button type=\"submit\" onclick=\"OH.saveProfile("+formSubmit+")\">Create</button></div>");
-			
+			StringBuffer saveButton	=	new StringBuffer("<div style=\"padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;\"><button type=\"submit\" onclick=\"OH.saveProfile("+formSubmit+")\">Update Profile</button></div>");
 			int indexOfdivTag	=	post_children.indexOf("</div>");
 			post_children.insert(indexOfdivTag+6, saveButton);
-			
 		}
 		return post_children;
 	}
@@ -86,5 +82,22 @@ public class HubUtility {
 		req.getSession().removeAttribute("ProfileId");
 		req.getSession().removeAttribute(HubUtility.CURRENT_XML_DOC_IN_SESSION);
 		ItemDataHolder.getItemDataHolder().setProfileDataMap(null);
+	}
+	
+	public static String getItemStatus(HttpServletRequest request,HttpServletResponse response,ItemRegistry itemRegistry,String nodeId){
+		String applicationMode	=	(String)request.getSession().getAttribute(HubUtility.APP_MODE);
+		String nodeStatus	=	null;
+		if(applicationMode!=null && (applicationMode.equals(HubUtility.CREATE_PROFILE) || applicationMode.equals(HubUtility.EDIT_PROFILE) )){
+			String nodeBidning	=	ItemDataHolder.getItemDataHolder().getProfileDataMap().get(nodeId);
+			printDebugMessage("HubUtil : getItemStatus : Last Status :", nodeBidning);
+			if(nodeBidning!=null && (nodeBidning.contains("ON") || nodeBidning.contains("on"))) {
+				nodeStatus	=	"OFF";
+			} else if(nodeBidning!=null && (nodeBidning.contains("OFF") || nodeBidning.contains("off"))) {
+				nodeStatus	=	"ON";	
+			}
+			
+		}
+				
+		return nodeStatus;
 	}
 }

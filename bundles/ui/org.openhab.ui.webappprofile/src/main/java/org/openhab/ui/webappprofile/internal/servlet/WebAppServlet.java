@@ -126,6 +126,19 @@ public class WebAppServlet extends BaseServlet {
 			HubUtility.printDebugMessage(this.toString(), "ProfilePageRenderer is not null");
 		}
 		
+		
+		String a	=	req.getParameter("action");
+		if(a!=null && a.equals("saveprofile")){
+			try{
+			StringBuilder pageContent	=	profilePageRenderer.processProfileMainPage("Home", "", "demo","demo",2);
+			res.getWriter().append(pageContent);
+			res.getWriter().close();
+			return;
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+			
+		}
 		//if(renderer==null){
 			//renderer	=	new PageRenderer();
 			

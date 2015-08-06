@@ -11,6 +11,7 @@ package org.openhab.ui.webappprofile.internal.servlet;
 import java.io.IOException;
 import java.util.Hashtable;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -18,11 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openhab.core.events.EventPublisher;
-import org.openhab.core.internal.ItemDataHolder;
 //import org.openhab.core.internal.ItemDataHolder;
 import org.openhab.ui.webappprofile.internal.common.HubUtility;
+import org.openhab.ui.webappprofile.internal.render.ProfilePageRenderer;
 import org.openhab.ui.webappprofile.internal.servlet.evthandler.AdminEventHandler;
 import org.openhab.ui.webappprofile.internal.xml.XMLDocument;
+import org.openhab.ui.webappprofile.render.RenderException;
 import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +42,21 @@ public class CmdServlet extends BaseServlet {
 
 	public static final String SERVLET_NAME = "/event";
 
+	private ProfilePageRenderer	profilePageRenderer;
+	
 	private EventPublisher eventPublisher;	
 
 
 	private XMLDocument xmlDocument	=	null;
 	
+	public ProfilePageRenderer getProfilePageRenderer() {
+		return profilePageRenderer;
+	}
+
+	public void setProfilePageRenderer(ProfilePageRenderer profilePageRenderer) {
+		this.profilePageRenderer = profilePageRenderer;
+	}
+
 	public void setEventPublisher(EventPublisher eventPublisher) {
 		this.eventPublisher = eventPublisher;
 	}
@@ -80,16 +92,34 @@ public class CmdServlet extends BaseServlet {
 			throws ServletException, IOException {
 		
 		HubUtility.printDebugMessage(this.toString(), "Got message in hub Command ");
-		
+		HubUtility.printDebugMessage(this.toString(), "Got message in hub Command And Pagerenderer is : "+profilePageRenderer);
 		
 		String actionId	=	req.getParameter(HubUtility.HUB_ACTION_PARAM);
-		if(actionId!=null && actionId.equals(HubUtility.SAVE_PROFILE)){
-			AdminEventHandler.saveProfile((HttpServletRequest)req);
-			HubUtility.cleanHttpSessionForNewProfile((HttpServletRequest)req);
-		} else {
-
-
-			AdminEventHandler.handleProfileCreateMode((HttpServletRequest)req,(HttpServletResponse)res,itemRegistry,eventPublisher);
+			try{
+			if(actionId!=null && actionId.equals(HubUtility.SAVE_PROFILE)){
+				HttpServletResponse httpResponse	=	(HttpServletResponse)res;
+				HttpServletRequest httpRequest	=	(HttpServletRequest)req;
+				
+				AdminEventHandler.saveProfile((HttpServletRequest)req);
+				HubUtility.cleanHttpSessionForNewProfile((HttpServletRequest)req);
+				return;				 
+			} else if(actionId!=null && actionId.equals(HubUtility.EDIT_PROFILE)){
+				//AdminEventHandler.handleProfileEditMode((HttpServletRequest)req,(HttpServletResponse)res,itemRegistry,eventPublisher);
+				AdminEventHandler.updateProfile((HttpServletRequest)req);
+				HubUtility.cleanHttpSessionForNewProfile((HttpServletRequest)req);			
+			} else {
+				//This block is default for actions submitted to CmdServlet.
+				//Check the application mode here for action to be taken.
+				String appMode	=	(String)((HttpServletRequest)req).getSession().getAttribute(HubUtility.APP_MODE);
+				if( appMode!=null && appMode.equals(HubUtility.CREATE_PROFILE)){
+					AdminEventHandler.handleProfileCreateMode((HttpServletRequest)req,(HttpServletResponse)res,itemRegistry,eventPublisher);	
+				} else if(appMode!=null && appMode.equals(HubUtility.EDIT_PROFILE)){
+					AdminEventHandler.handleProfileEditMode((HttpServletRequest)req,(HttpServletResponse)res,itemRegistry,eventPublisher);
+				}
+				
+			} 
+		} catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 	

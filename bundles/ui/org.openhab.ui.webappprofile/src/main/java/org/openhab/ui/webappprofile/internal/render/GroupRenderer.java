@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.openhab.model.sitemap.Group;
 import org.openhab.model.sitemap.Widget;
+import org.openhab.ui.webappprofile.internal.common.HubUtility;
 import org.openhab.ui.webappprofile.render.RenderException;
 import org.openhab.ui.webappprofile.render.WidgetRenderer;
 
@@ -44,7 +45,7 @@ public class GroupRenderer extends AbstractWidgetRenderer {
 
 		// Process the color tags
 		snippet = processColor(w, snippet);
-
+		HubUtility.printDebugMessage(this.toString(), "GroupRendere Snippet : "+snippet);
 		sb.append(snippet);
 		return null;
 	}

@@ -145,6 +145,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
 		NodeList	nodeList	=	doc.getElementsByTagName(strParentNode);
 		HubUtility.printDebugMessage(this.toString(), "addChileNode : chileNode       : "+chileNode);
 		HubUtility.printDebugMessage(this.toString(), "addChileNode : chiledNodeValue : "+chiledNodeValue);
+		boolean isExistingNode	=	false;
 		HashMap<String, String> profileDataMap	=	null;
 		if(nodeList!=null && nodeList.getLength()>0){
 			//First check if child node is existing.
@@ -153,9 +154,12 @@ public class XMLDocumentDomImpl implements XMLDocument {
 			Node	parentNode	=	nodeList.item(0);
 			Element	parentNodeElement	=	(Element)parentNode;
 			
-			NodeList childElementNode	=	parentNodeElement.getElementsByTagName(chileNode);
-			if(childElementNode!=null && childElementNode.getLength()>0){
+			NodeList childElementNodeList	=	parentNodeElement.getElementsByTagName(chileNode);
+			if(childElementNodeList!=null && childElementNodeList.getLength()>0){
 				HubUtility.printDebugMessage(this.toString(), "Chile is existing");
+				Element childElementNode	=	(Element)childElementNodeList.item(0);
+				childElementNode.getParentNode().removeChild(childElementNode);
+				isExistingNode	=	true;
 			}
 			
 			//isChildNodeExisting(parentNode.getN,chileNode);
@@ -167,6 +171,12 @@ public class XMLDocumentDomImpl implements XMLDocument {
 				ItemDataHolder.getItemDataHolder().setProfileDataMap(profileDataMap);
 			} else {
 				profileDataMap	=	ItemDataHolder.getItemDataHolder().getProfileDataMap();
+				if(isExistingNode){
+					HubUtility.printDebugMessage(this.toString(), "Removing old entry from HashMap for node "+chileNode);
+					profileDataMap.remove(chileNode);
+					
+				}
+
 			}
 			profileDataMap.put(chileNode, chiledNodeValue+"~"+parentNode);
 		} else {
@@ -190,6 +200,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
 			}
 			profileDataMap.put(chileNode, chiledNodeValue+"~"+strParentNode);
 		}
+		HubUtility.printDebugMessage(this.toString(),"Current XMLDocument Is : "+profileDataMap);
 		ItemDataHolder.getItemDataHolder().setProfileDataMap(profileDataMap);
 		return true;
 		
@@ -228,6 +239,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
 	    return listOfFiles;
 	}
 	
+	
 	public void writeToFile(){
 		try{
 			
@@ -265,12 +277,46 @@ public class XMLDocumentDomImpl implements XMLDocument {
 		}
 	
 	}
+
+	public void updateToFile(){
+		try{
+			
+			String ECLIPSEHOME	=	System.getenv("ECLIPSEHOME");
+			System.out.println("\n ECLIPSEHOME : "+ECLIPSEHOME);
+			
+			String dirLocation	=	ECLIPSEHOME+File.separator+HubUtility.PROFILEDIR;//+File.separator+profileId+".xml";
+			String fileLoaction	=	dirLocation+File.separator+profileId+".xml";
+			
+			File profileFile	=	new File(fileLoaction);
+			profileFile.delete();
+			
+			//File	profileDir	=	
+			System.out.println("\n ProfilePath : "+fileLoaction);
+		
+			
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			//StreamResult result = new StreamResult(new File("D:\\file.xml"));
+			StreamResult result = new StreamResult(new File(fileLoaction));
+			// Output to console for testing
+			// StreamResult result = new StreamResult(System.out);
+ 
+			transformer.transform(source, result);
+ 
+			System.out.println("File Update!");
+		} catch (TransformerException e){
+			e.printStackTrace();
+		}
 	
+	}
+
 	public void updateDocumentObject(String nodeId,String nodeBinding,String nodeState, String nodeType,Item item){
 
 //		AdminEvent-0 : >[mosquitto:/raspberry:command:ON:OL1N0L2N1S1100000000
 //		AdminEvent-1 : >[mosquitto:/raspberry:command:OFF:OL1N0L2N1S1000000000
 //		AdminEvent Command:  : ON
+		HubUtility.printDebugMessage(this.toString(),"Submitted Node State "+nodeState);
 		String bindingState	=	getBindingConfig(nodeBinding,nodeState);
 		//Node02 (Type=SwitchItem, State=OFF)
 		String itemDetails	=	item.toString();
@@ -300,6 +346,8 @@ public class XMLDocumentDomImpl implements XMLDocument {
 
 	  public void readAndUpdateProfileDataIntoMemory(HttpServletRequest req,String fileName) {
 		  HashMap<String, String> profileDataMap	=	null;
+		  profileId	=	fileName;
+		  
 		  boolean isSuccess	=	false;
 		  try {
 	    	
