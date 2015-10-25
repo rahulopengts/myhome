@@ -42,7 +42,7 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 	 */
 	public MqttMessagePublisher(String configuration) throws BindingConfigParseException {
 
-		System.out.println("\n MqttMessagePublisher : "+configuration);
+		//System.out.println("\n MqttMessagePublisher : "+configuration);
 		String[] config = splitConfigurationString(configuration);
 		try {
 
@@ -179,7 +179,7 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 		}
 		
 		try {
-			System.out.println("\n MqttMessagePublisher : publish message : "+topic+ " : Message is ::"+new String(createMessage(new String(message))));
+			//System.out.println("\n MqttMessagePublisher : publish message : "+topic+ " : Message is ::"+new String(createMessage(new String(message))));
 			senderChannel.publish(topic, createMessage(new String(message)));
 		} catch (Exception e) {
 			logger.error("Error publishing...", e);

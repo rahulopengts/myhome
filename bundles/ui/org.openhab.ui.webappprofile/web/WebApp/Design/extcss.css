@@ -6,10 +6,13 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Nunito', sans-serif;
-  color: #384047;
-}
+body {background: repeating-linear-gradient(
+  to right,
+  #C1C1DA,
+  #C1C1DA 2px,
+  #C8C8DE 2px,
+  #C8C8DE 4px
+);}
 
 form {
   max-width: 100%;
@@ -38,6 +41,7 @@ textarea,
 select {
   background: rgba(255, 255, 255, 0.1);
   border: none;
+  
   font-size: 16px;
   height: auto;
   margin: 0;
@@ -64,13 +68,13 @@ select {
 button {
   padding: 19px 39px 18px 39px;
   color: #FFF;
-  background-color: #4bc970;
+  background-color: #FF6600;
   font-size: 18px;
   text-align: center;
   font-style: normal;
   border-radius: 5px;
   width: 100%;
-  border: 1px solid #3ac162;
+  border: 1px solid #FF6600;
   border-width: 1px 1px 3px;
   box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1) inset;
   margin-bottom: 10px;
@@ -88,6 +92,7 @@ legend {
 }
 
 label {
+
   display: block;
   margin-bottom: 8px;
 }
@@ -98,7 +103,7 @@ label.light {
 }
 
 .number {
-  background-color: #5fcf80;
+  background-color: #FF6600;
   color: #fff;
   height: 30px;
   width: 30px;

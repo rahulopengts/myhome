@@ -23,7 +23,7 @@ public final class WebAppActivator implements BundleActivator {
 	 */
 	public void start(BundleContext bc) throws Exception {
 		context = bc;
-		System.out.println("\n Activating WebAppProfile");
+		//System.out.println("\n Activating WebAppProfile");
 	}
 
 	/**

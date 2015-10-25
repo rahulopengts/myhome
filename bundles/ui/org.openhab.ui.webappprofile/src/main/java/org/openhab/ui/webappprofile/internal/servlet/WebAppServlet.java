@@ -119,7 +119,7 @@ public class WebAppServlet extends BaseServlet {
 	public void service(ServletRequest req, ServletResponse res)
 			throws ServletException, IOException {
 		logger.debug("Servlet request received!");
-		System.out.println("\n NEW SERVLET SERVICE :");
+		//System.out.println("\n NEW SERVLET SERVICE :");
 		HttpServletRequest	httpRequest	=	(HttpServletRequest)req;
 		String requestPATH	=	httpRequest.getRequestURI();
 		if(profilePageRenderer!=null){
@@ -149,7 +149,7 @@ public class WebAppServlet extends BaseServlet {
 		boolean async = "true".equalsIgnoreCase((String) req.getParameter("__async"));
 		boolean poll = "true".equalsIgnoreCase((String) req.getParameter("poll"));
 				
-		System.out.println("\n async "+async+" poll "+poll);
+		//System.out.println("\n async "+async+" poll "+poll);
 		
 		// if there are no parameters, display the "default" sitemap
 		//if(sitemapName==null) 
@@ -161,7 +161,7 @@ public class WebAppServlet extends BaseServlet {
 		Sitemap sitemap = sitemapProvider.getSitemap(sitemapName);
 		
 		int evalId	=	evalRequest((HttpServletRequest)req, (HttpServletResponse)res);
-		System.out.println("\n NEW SERVLET :"+requestPATH+" : "+evalId);
+		//System.out.println("\n NEW SERVLET :"+requestPATH+" : "+evalId);
 		
 //**************************
 		//System.out.println(" SitemapNameAA"+sitemapName+" Sitemap-- ");//);
@@ -171,7 +171,7 @@ public class WebAppServlet extends BaseServlet {
 		
 		try {
 			if(evalId!=0){
-				System.out.println("\n RETURN");
+				//System.out.println("\n RETURN");
 				
 				//StringBuilder pageContent	=	pageRenderer.processProfileMainPage("Home", sitemapName, sitemapName, sitemap.getChildren(), async);
 				StringBuilder pageContent	=	profilePageRenderer.processProfileMainPage("Home", "", sitemapName,sitemapName,evalId);
@@ -212,7 +212,7 @@ public class WebAppServlet extends BaseServlet {
 				// we are on some subpage, so we have to render the children of the widget that has been selected
 				Widget w = pageRenderer.getItemUIRegistry().getWidget(sitemap, widgetId);
 				
-				System.out.println(" \\n Colorpicker widgetId :"+widgetId+" Widget Id :"+w.getItem()+" Label "+w.getLabel());
+				//System.out.println(" \\n Colorpicker widgetId :"+widgetId+" Widget Id :"+w.getItem()+" Label "+w.getLabel());
 				if(w!=null) {
 					if(!(w instanceof LinkableWidget)) {
 						throw new RenderException("Widget '" + w + "' can not have any content");
@@ -244,7 +244,7 @@ public class WebAppServlet extends BaseServlet {
 			res.setContentType("text/html;charset=UTF-8");
 		}
 		
-		System.out.println("Testing New Servlet: \n "+ result.toString());
+		//System.out.println("Testing New Servlet: \n "+ result.toString());
 		res.getWriter().append(result);
 		res.getWriter().close();
 	}

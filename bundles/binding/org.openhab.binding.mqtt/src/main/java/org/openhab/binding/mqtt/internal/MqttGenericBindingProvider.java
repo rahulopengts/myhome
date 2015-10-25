@@ -61,8 +61,8 @@ public class MqttGenericBindingProvider extends AbstractGenericBindingProvider i
 
 		final MqttItemConfig itemConfig = new MqttItemConfig(itemName, bindingConfig);
 		ItemDataHolder	itemDataHolder	=	ItemDataHolder.getItemDataHolder();
-		System.out.println("\n ItemDataHolder : "+itemDataHolder);
-		System.out.println("\n MQTT Item : "+itemConfig);
+//		System.out.println("\n ItemDataHolder : "+itemDataHolder);
+//		System.out.println("\n MQTT Item : "+itemConfig);
 
 		// register all message consumers
 		for (MqttMessageSubscriber subscriber : itemConfig.getMessageSubscribers()) {
@@ -110,7 +110,7 @@ public class MqttGenericBindingProvider extends AbstractGenericBindingProvider i
 			for(int i=0;i<size;i++){
 				MqttMessagePublisher	pub	=	(MqttMessagePublisher)list.get(i);
 				
-				System.out.println("\n MqttGenericBindingProvider : Size : "+itemName+ ": Pub : "+pub);
+//				System.out.println("\n MqttGenericBindingProvider : Size : "+itemName+ ": Pub : "+pub);
 			}
 			
 		}

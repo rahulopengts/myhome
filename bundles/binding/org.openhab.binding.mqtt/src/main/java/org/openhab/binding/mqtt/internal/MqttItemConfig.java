@@ -44,7 +44,7 @@ public class MqttItemConfig implements BindingConfig {
 	 */
 	public MqttItemConfig(String itemName, String bindingConfig) throws BindingConfigParseException {
 
-		System.out.println("\n MqttItemConfig itemName : "+itemName+" bindingConfig : "+bindingConfig+" Instance Is : "+ItemDataHolder.getItemDataHolder());
+		//System.out.println("\n MqttItemConfig itemName : "+itemName+" bindingConfig : "+bindingConfig+" Instance Is : "+ItemDataHolder.getItemDataHolder());
 		
 		ItemDataHolder.getItemDataHolder().addDataMap(itemName, bindingConfig);
 		

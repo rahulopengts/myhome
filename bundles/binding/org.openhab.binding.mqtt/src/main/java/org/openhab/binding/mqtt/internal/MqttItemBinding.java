@@ -42,9 +42,9 @@ public class MqttItemBinding extends AbstractBinding<MqttBindingProvider> {
 		for (MqttMessagePublisher publisher : itemConfig.getMessagePublishers()) {
 			if (publisher.supportsCommand(command)) {
 				logger.debug("Publishing command {} to {}", command.toString(), publisher.getTopic());
-				System.out.println(" Publishing state  ItemName  : "+itemName+" Topic : "+publisher.getTopic());
-				System.out.println(" MqttItemConfig : "+itemConfig.getMessagePublishers());				
-				System.out.println(" MqttMessage    : "+command.toString());
+//				System.out.println(" Publishing state  ItemName  : "+itemName+" Topic : "+publisher.getTopic());
+//				System.out.println(" MqttItemConfig : "+itemConfig.getMessagePublishers());				
+//				System.out.println(" MqttMessage    : "+command.toString());
 				publisher.publish(publisher.getTopic(), command.toString().getBytes());
 			}
 		}

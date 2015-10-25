@@ -249,7 +249,7 @@ public class ItemRegistryImpl implements ItemRegistry, ItemsChangeListener {
 	 * @return false, if the item has no valid name
 	 */
 	private boolean initializeItem(Item item) {
-		System.out.println("\n ItemRegistry InitializeItem : "+item);
+		//System.out.println("\n ItemRegistry InitializeItem : "+item);
 		if(isValidItemName(item.getName())) {
 			if(item instanceof GenericItem) {
 				GenericItem genericItem = (GenericItem) item;
@@ -272,7 +272,7 @@ public class ItemRegistryImpl implements ItemRegistry, ItemsChangeListener {
 					Item groupItem = getItem(groupName);
 					if(groupItem instanceof GroupItem) {
 						((GroupItem)groupItem).addMember(item);
-						System.out.println("\n ItemRegistry : Item "+item.getName());
+						//System.out.println("\n ItemRegistry : Item "+item.getName());
 					}
 				} catch (ItemNotFoundException e) {
 					// the group might not yet be registered, let's ignore this

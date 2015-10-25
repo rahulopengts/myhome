@@ -1,6 +1,12 @@
 * {font-family: Helvetica Neue, Arial, sans-serif; }
 
-body { background-image: linear-gradient(#aaa 25%, #000);}
+body {background: repeating-linear-gradient(
+  to right,
+  #C1C1DA,
+  #C1C1DA 2px,
+  #C8C8DE 2px,
+  #C8C8DE 4px
+);}
 
 h1, table { text-align: center; }
 
@@ -8,11 +14,11 @@ table {border-collapse: collapse;  width: 100%; margin: 0 auto 5rem;}
 
 th, td { padding: 1.5rem; font-size: 1.3rem; }
 
-tr {background: hsl(90, 50%, 80%); }
+tr {background: hsl(90%, 50%, 80%); }
 
 tr, td { transition: .4s ease-in; } 
 
-tr:first-child {background: hsla(92, 100%, 40%, 0.5); }
+tr:first-child {background: hsla(24, 100%, 50%, 1.0); }
 
 tr:nth-child(even) { background: hsla(90, 50%, 80%, 0.7); }
 

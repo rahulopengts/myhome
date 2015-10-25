@@ -104,8 +104,8 @@ public class XMLDocumentDomImpl implements XMLDocument {
 				//Element reSwitchOn	=	doc.getElementById("1");					
 				NodeList reSwitchOn	=	doc.getElementsByTagName("switchon");
 				//doc.getElementsByTagName(tagname)
-				System.out.println("\n Element 1: "+switchon);
-				System.out.println("\n Element 2: "+reSwitchOn.item(0));
+//				System.out.println("\n Element 1: "+switchon);
+//				System.out.println("\n Element 2: "+reSwitchOn.item(0));
 				
 				
 				
@@ -222,17 +222,17 @@ public class XMLDocumentDomImpl implements XMLDocument {
 	}
 	public static File[] getProfileList(){
 		
-		String dirLocation	=	System.getenv("ECLIPSEHOME")+File.separator+HubUtility.PROFILEDIR;//+File.separator+profileId+".xml";
+		String dirLocation	=	System.getProperty("ECLIPSEHOME")+File.separator+HubUtility.PROFILEDIR;//+File.separator+profileId+".xml";
 		
 		File folder = new File(dirLocation);
 		File[] listOfFiles = folder.listFiles();
 
 	    for (int i = 0; i < listOfFiles.length; i++) {
 	      if (listOfFiles[i].isFile()) {
-	        System.out.println("File " + listOfFiles[i].getName());
+	        //System.out.println("File " + listOfFiles[i].getName());
 	        
 	      } else if (listOfFiles[i].isDirectory()) {
-	        System.out.println("Directory " + listOfFiles[i].getName());
+	        //System.out.println("Directory " + listOfFiles[i].getName());
 	      }
 	    }
 	    
@@ -243,8 +243,9 @@ public class XMLDocumentDomImpl implements XMLDocument {
 	public void writeToFile(){
 		try{
 			
-			String ECLIPSEHOME	=	System.getenv("ECLIPSEHOME");
-			System.out.println("\n ECLIPSEHOME : "+ECLIPSEHOME);
+			String ECLIPSEHOME	=	System.getProperty("ECLIPSEHOME");
+			//String ECLIPSEHOME	=	System.getenv("ECLIPSEHOME");
+//			System.out.println("\n ECLIPSEHOME : "+ECLIPSEHOME);
 			
 			String dirLocation	=	ECLIPSEHOME+File.separator+HubUtility.PROFILEDIR;//+File.separator+profileId+".xml";
 			
@@ -252,13 +253,13 @@ public class XMLDocumentDomImpl implements XMLDocument {
 			boolean isExisting	=	profileDir.isDirectory();
 			if(!isExisting){
 				profileDir.mkdir();
-			}
+			} 
 			
 			String fileLoaction	=	dirLocation+File.separator+profileId+".xml";
 			
 			
 			//File	profileDir	=	
-			System.out.println("\n ProfilePath : "+fileLoaction);
+			//System.out.println("\n ProfilePath : "+fileLoaction);
 		
 			
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -271,7 +272,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
  
 		transformer.transform(source, result);
  
-		System.out.println("File saved!");
+		//System.out.println("File saved!");
 		} catch (TransformerException e){
 			e.printStackTrace();
 		}
@@ -282,7 +283,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
 		try{
 			
 			String ECLIPSEHOME	=	System.getenv("ECLIPSEHOME");
-			System.out.println("\n ECLIPSEHOME : "+ECLIPSEHOME);
+			//System.out.println("\n ECLIPSEHOME : "+ECLIPSEHOME);
 			
 			String dirLocation	=	ECLIPSEHOME+File.separator+HubUtility.PROFILEDIR;//+File.separator+profileId+".xml";
 			String fileLoaction	=	dirLocation+File.separator+profileId+".xml";
@@ -291,7 +292,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
 			profileFile.delete();
 			
 			//File	profileDir	=	
-			System.out.println("\n ProfilePath : "+fileLoaction);
+			//System.out.println("\n ProfilePath : "+fileLoaction);
 		
 			
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -304,7 +305,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
  
 			transformer.transform(source, result);
  
-			System.out.println("File Update!");
+			//System.out.println("File Update!");
 		} catch (TransformerException e){
 			e.printStackTrace();
 		}
@@ -350,8 +351,8 @@ public class XMLDocumentDomImpl implements XMLDocument {
 		  
 		  boolean isSuccess	=	false;
 		  try {
-	    	
-			String fileLocation	=	System.getenv("ECLIPSEHOME")+File.separator+HubUtility.PROFILEDIR+File.separator+fileName+".xml";
+			String ECLIPSEHOME	=	System.getProperty("ECLIPSEHOME");
+			String fileLocation	=	ECLIPSEHOME+File.separator+HubUtility.PROFILEDIR+File.separator+fileName+".xml";
 			
 			File fXmlFile = new File(fileLocation);
 			
@@ -366,13 +367,13 @@ public class XMLDocumentDomImpl implements XMLDocument {
 		//optional, but recommended
 		//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
 			doc.getDocumentElement().normalize();		 
-			System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+			//System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 			NodeList nList = doc.getElementsByTagName("profileId");
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				Node nNode = nList.item(temp);
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
-					System.out.println("Profile id : " + eElement.getAttribute("profileId"));
+					//System.out.println("Profile id : " + eElement.getAttribute("profileId"));
 					NodeList	profileNodeChild	=	eElement.getChildNodes();
 					for(int nodeIndex=0;nodeIndex<profileNodeChild.getLength();nodeIndex++){
 						Node profileIdChildNode	=	profileNodeChild.item(nodeIndex);
@@ -381,7 +382,7 @@ public class XMLDocumentDomImpl implements XMLDocument {
 							profileDataMap	=	processProfileDataMap(profileIdChildElement);
 							ItemDataHolder.getItemDataHolder().setProfileDataMap(profileDataMap);
 							isSuccess	=	true;
-							System.out.println("\nCurrent Profile Element :" + profileIdChildElement.getNodeName());
+							//System.out.println("\nCurrent Profile Element :" + profileIdChildElement.getNodeName());
 							//This will have all child of profileId such as ProfileName, SwitchOn,SwitchOff,SwitchItem etc.
 							
 						}

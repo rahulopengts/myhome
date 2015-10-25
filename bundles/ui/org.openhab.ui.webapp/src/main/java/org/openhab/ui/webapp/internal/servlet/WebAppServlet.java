@@ -97,7 +97,7 @@ public class WebAppServlet extends BaseServlet {
 	public void service(ServletRequest req, ServletResponse res)
 			throws ServletException, IOException {
 		logger.debug("Servlet request received!");
-		System.out.println("Servlet request received!");
+		//System.out.println("Servlet request received!");
 		// read request parameters
 		String sitemapName = (String) req.getParameter("sitemap");
 		String widgetId = (String) req.getParameter("w");

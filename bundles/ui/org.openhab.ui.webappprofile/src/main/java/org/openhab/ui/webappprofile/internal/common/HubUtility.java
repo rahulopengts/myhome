@@ -21,7 +21,7 @@ public class HubUtility {
 	public static String ARRAY_PAGENAME[]	=	{"main","mainprofilepage","createprofile"};
 	
 	
-	public static boolean DEBUG	=	true;
+	public static boolean DEBUG	=	false;
 	public static String HUB_BASE_URI	=	"hub/profile";
 	public static String CREATE			=	"create";
 	public static String SUBMIT			=	"submit";

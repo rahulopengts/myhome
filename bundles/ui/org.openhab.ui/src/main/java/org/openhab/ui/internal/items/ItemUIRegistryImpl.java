@@ -370,7 +370,7 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 			}
 		}
 
-		System.out.println("\n Item :icon: "+icon);
+		//System.out.println("\n Item :icon: "+icon);
 		// now add the state, if the string does not already contain a state
 		// information
 		if(!icon.contains("-")) {
@@ -416,7 +416,7 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 		if(itemName!=null) {
 			try {
 				Item item = getItem(itemName);
-				System.out.println("\n ItemUIRegisttryImpl Item Class Type "+item.getClass());
+				//System.out.println("\n ItemUIRegisttryImpl Item Class Type "+item.getClass());
 				return item.getState();
 			} catch (ItemNotFoundException e) {
 				logger.error("Cannot retrieve item '{}' for widget {}", new String[] { itemName, w.eClass().getInstanceTypeName() });
@@ -433,7 +433,7 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 		if(itemName!=null) {
 			try {
 				Item item = getItem(itemName);
-				System.out.println("\n ItemUIRegisttryImpl Item Class Type "+item.getClass());
+				//System.out.println("\n ItemUIRegisttryImpl Item Class Type "+item.getClass());
 				return item.getState();
 			} catch (ItemNotFoundException e) {
 				logger.error("Cannot retrieve item '{}' for widget {}", new String[] { itemName, w.eClass().getInstanceTypeName() });
@@ -969,7 +969,7 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 				}
 			}
 
-			System.out.println("\n Item :icon: "+icon);
+			//System.out.println("\n Item :icon: "+icon);
 			// now add the state, if the string does not already contain a state
 			// information
 			if(!icon.contains("-")) {
@@ -980,14 +980,14 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 					
 				
 				itemType	=	itemProfileBinding.substring(itemProfileBinding.indexOf("~")+1, itemProfileBinding.length());
-				System.out.println("\n SwitchItem Type : "+itemType+":: "+w.getItem().toString());
+				//System.out.println("\n SwitchItem Type : "+itemType+":: "+w.getItem().toString());
 				if(itemType.equals("SwitchItem")){
-					System.out.println("\n SwitchItem Type with b "+itemProfileBinding);
+					//System.out.println("\n SwitchItem Type with b "+itemProfileBinding);
 					if(itemProfileBinding.contains("ON")){
-						System.out.println("\n SwitchItem ON ");
+						//System.out.println("\n SwitchItem ON ");
 						icon += "-" + "ON".toLowerCase();
 					} else {
-						System.out.println("\n SwitchItem OFF ");
+						//System.out.println("\n SwitchItem OFF ");
 						icon += "-" + "OFF".toLowerCase();	
 					}
 					return icon;
