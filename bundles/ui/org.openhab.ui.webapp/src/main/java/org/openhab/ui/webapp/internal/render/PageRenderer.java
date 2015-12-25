@@ -42,7 +42,10 @@ public class PageRenderer extends AbstractWidgetRenderer {
 
 	List<WidgetRenderer> widgetRenderers = new ArrayList<WidgetRenderer>();
 
+	int i=0;
 	public void addWidgetRenderer(WidgetRenderer widgetRenderer) {
+		//System.out.println("\n PageRender-> processChildren->Count of Renderer ->"+widgetRenderers.size()+":this:"+this);
+		//System.out.println("\n PageRender-> processChildren->Count of Renderer ->"+widgetRenderer.getClass().getSimpleName());
 		widgetRenderers.add(widgetRenderer);
 	}
 
@@ -88,7 +91,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 		} else if(parts.length > 2){
 			logger.error("Snippet '{}' contains multiple %children% sections, but only one is allowed!", async ? "layer" : "main");
 		}
-		//System.out.println("\n pre_children "+pre_children);
+		////System.out.println("\n pre_children "+pre_children);
 		return pre_children.append(post_children);
 	}
 
@@ -116,11 +119,15 @@ public class PageRenderer extends AbstractWidgetRenderer {
 			}
 		}
 
+		////System.out.println("\n PageRender-> processChildren->Count of Renderer ->"+widgetRenderers.size());
+		////System.out.println("\nPageRenderer->procesChildred->First Children-> "+children);
 		for(Widget w : children) {
+			//System.out.println("\nPageRenderer->procesChildred->Calling renderWidget for -> "+w.getClass().getSimpleName());
 			StringBuilder new_pre = new StringBuilder();
 			StringBuilder new_post = new StringBuilder();
 			StringBuilder widgetSB = new StringBuilder();
 			EList<Widget> nextChildren = renderWidget(w, widgetSB);
+			////System.out.println("\nPageRenderer->procesChildred->Next Children-> "+nextChildren);
 			if(nextChildren!=null) {
 				String[] parts = widgetSB.toString().split("%children%");
 				// no %children% placeholder found or at the end
@@ -142,10 +149,10 @@ public class PageRenderer extends AbstractWidgetRenderer {
 				sb_pre.append(new_pre);
 				sb_pre.append(new_post);
 				
-//				System.out.println("\n PageRenderer : ProcessChildren Pre : "+sb_pre);
-//				System.out.println("\n PageRenderer : ProcessChildren Post: "+sb_post);
+//				//System.out.println("\n PageRenderer : ProcessChildren Pre : "+sb_pre);
+//				//System.out.println("\n PageRenderer : ProcessChildren Post: "+sb_post);
 			} else {
-//				System.out.println("\n PageRenderer : ProcessChildren sb_pre: "+sb_pre);
+//				//System.out.println("\n PageRenderer : ProcessChildren sb_pre: "+sb_pre);
 				sb_pre.append(widgetSB);
 			}
 		}
@@ -160,11 +167,12 @@ public class PageRenderer extends AbstractWidgetRenderer {
 		if(itemUIRegistry.getVisiblity(w) == false)
 			return null;
 
+		
+		
 		for(WidgetRenderer renderer : widgetRenderers) {
+			//System.out.println("\nPageRenderer->procesChildred->WidgetRenders-> "+renderer.getClass().getSimpleName());
 			if(renderer.canRender(w)) {
-				//String ren =	renderer.renderWidget(w, sb)
-//				System.out.println("\n Render : "+w + " SB : "+sb.toString());
-				printContent(w);
+				////System.out.println("\n PageRender-> renderWidget->Checking the Instance of Renderer ->"+renderer);
 				return renderer.renderWidget(w, sb);
 			}
 		}
@@ -182,9 +190,9 @@ public class PageRenderer extends AbstractWidgetRenderer {
 		TreeIterator t	=	 w.eAllContents();
 		while(t.hasNext()){
 			Object o	=	t.next();
-//			System.out.println(o);
+//			//System.out.println(o);
 		}
 		EList elist	=	w.eContents();
-//		System.out.println("\n Elist : "+elist.toString());
+//		//System.out.println("\n Elist : "+elist.toString());
 	}
 }

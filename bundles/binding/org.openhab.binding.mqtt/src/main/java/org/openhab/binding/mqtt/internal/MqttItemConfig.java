@@ -30,6 +30,24 @@ public class MqttItemConfig implements BindingConfig {
 
 	private List<MqttMessagePublisher> publishConfigurations = new ArrayList<MqttMessagePublisher>();
 
+	public List<MqttMessagePublisher> getPublishConfigurations() {
+		return publishConfigurations;
+	}
+
+	public void setPublishConfigurations(
+			List<MqttMessagePublisher> publishConfigurations) {
+		this.publishConfigurations = publishConfigurations;
+	}
+
+	public List<MqttMessageSubscriber> getSubscribeConfigurations() {
+		return subscribeConfigurations;
+	}
+
+	public void setSubscribeConfigurations(
+			List<MqttMessageSubscriber> subscribeConfigurations) {
+		this.subscribeConfigurations = subscribeConfigurations;
+	}
+
 	private List<MqttMessageSubscriber> subscribeConfigurations = new ArrayList<MqttMessageSubscriber>();
 
 	/**

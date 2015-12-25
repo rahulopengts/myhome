@@ -149,6 +149,7 @@ public class RRD4jService implements QueryablePersistenceService {
 				logger.debug("Error closing rrd4j database: {}", e.getMessage());
 			}
 		}
+		
 	}
 
 	/**
@@ -161,6 +162,11 @@ public class RRD4jService implements QueryablePersistenceService {
 	@Override
 	public Iterable<HistoricItem> query(FilterCriteria filter) {
 		String itemName = filter.getItemName();
+		//System.out.println("\nRRD4jService->query->"+itemName);
+//		String n=	null;
+//		n.getBytes();
+//		return null;
+		
 		ConsolFun consolidationFunction = getConsolidationFunction(itemName);
 		RrdDb db = getDB(itemName, consolidationFunction);
 		if(db!=null) {
@@ -196,11 +202,14 @@ public class RRD4jService implements QueryablePersistenceService {
 
 				List<HistoricItem> items = new ArrayList<HistoricItem>();
 				FetchData result = request.fetchData();
+				
+				//System.out.println("\n***RRD4JService-query->Item->"+itemName+"->State->"+result.toString());
 				long ts = result.getFirstTimestamp();
 				long step = result.getRowCount() > 1 ? result.getStep() : 0;
 				for(double value : result.getValues(DATASOURCE_STATE)) {
 					if(!Double.isNaN(value)) {
 						RRD4jItem rrd4jItem = new RRD4jItem(itemName, mapToState(value, itemName), new Date(ts * 1000));
+						
 						items.add(rrd4jItem);
 					}
 					ts += step;
@@ -288,6 +297,7 @@ public class RRD4jService implements QueryablePersistenceService {
 	}
 
 	private State mapToState(double value, String itemName) {
+		//System.out.println("\n RRD4jService->mapToSate->itemName->"+itemName+" itemRegistry->"+itemRegistry);
 		if(itemRegistry!=null) {
 			try {
 				Item item = itemRegistry.getItem(itemName);

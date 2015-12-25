@@ -96,6 +96,7 @@ public class ConfigDispatcher implements ManagedService {
 	
 	
 	public void activate() {
+		System.out.println("\nConfigDispather->activate->");
 		initializeBundleConfigurations();
 		if (refreshInterval > -1) {
 			scheduleRefreshJob();
@@ -144,6 +145,7 @@ public class ConfigDispatcher implements ManagedService {
 		File defaultConfigFile = new File(defaultConfigFilePath);
 		try {
 			logger.debug("Processing openHAB default configuration file '{}'.", defaultConfigFile.getAbsolutePath());
+			//System.out.println("\n***ConfigDispatcher-initializeDefaultConfiguration -> defaultConfigfile "+defaultConfigFile.getAbsolutePath());			
 			processConfigFile(defaultConfigFile);
 		} catch (FileNotFoundException e) {
 			// we do not care if we do not have a default file
@@ -187,21 +189,32 @@ public class ConfigDispatcher implements ManagedService {
 			Map<Configuration, Dictionary> configMap = new HashMap<Configuration, Dictionary>();
 			
 			List<String> lines = IOUtils.readLines(new FileInputStream(configFile));
-			for(String line : lines) {					
+			int i=0;
+			for(String line : lines) {
+				i++;
 				String[] contents = parseLine(configFile.getPath(), line);
 				// no valid configuration line, so continue
 				if(contents==null) continue;
 				String pid = contents[0];
 				String property = contents[1];
 				String value = contents[2];
+				
 				Configuration configuration = configurationAdmin.getConfiguration(pid, null);
+				
 				if(configuration!=null) {
 					Dictionary configProperties = configMap.get(configuration);
 					if(configProperties==null) {
+						////System.out.println("\n***ConfigDispather->processConfigFile->configProperties null for "+pid);
+					} else {
+						////System.out.println("\n***ConfigDispather->processConfigFile->configProperties Not  for "+pid);
+					}
+					if(configProperties==null) {
+						//System.out.println("\n***ConfigDispather->processConfigFile->configProperties not Null->"+i+pid+":property->:"+property+":value:"+value);
 						configProperties = new Properties();
 						configMap.put(configuration, configProperties);
 					}
 					if(!value.equals(configProperties.get(property))) {
+						//System.out.println("\n***ConfigDispather->processConfigFile->configProperties !Value->"+i+pid+":property->:"+property+":value:"+value);
 						configProperties.put(property, value);
 						configsToUpdate.put(configuration, configProperties);
 					}
@@ -209,6 +222,8 @@ public class ConfigDispatcher implements ManagedService {
 			}
 			
 			for(Entry<Configuration, Dictionary> entry : configsToUpdate.entrySet()) {
+				//System.out.println("\n***ConfigDispather->processConfigFile->configuration.getPid() "+entry.getKey());
+				
 				entry.getKey().update(entry.getValue());
 			}
 		}
@@ -324,6 +339,7 @@ public class ConfigDispatcher implements ManagedService {
 	
 	
 	public void updated(Dictionary<String, ?> config) throws ConfigurationException {
+		System.out.println("\nConfigDispather->updated->");
 		if (config != null) {
 			String refreshIntervalString = (String) config.get("refresh");
 			if (isNotBlank(refreshIntervalString)) {

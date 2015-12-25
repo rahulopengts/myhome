@@ -9,6 +9,8 @@
 package org.openhab.binding.mqtt.internal;
 
 import java.awt.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mqtt.MqttBindingProvider;
@@ -34,6 +36,18 @@ public class MqttGenericBindingProvider extends AbstractGenericBindingProvider i
 	private static final Logger logger = LoggerFactory.getLogger(MqttGenericBindingProvider.class);
 
 	private MqttService mqttService;
+	
+	//CloudChange
+	private Map<String, MqttItemConfig> mqttItemConfigList	=	new HashMap<>();
+	
+
+	public Map<String, MqttItemConfig> getMqttItemConfigList() {
+		return mqttItemConfigList;
+	}
+
+	public void setMqttItemConfigList(Map<String, MqttItemConfig> mqttItemConfigList) {
+		this.mqttItemConfigList = mqttItemConfigList;
+	}
 
 	@Override
 	public String getBindingType() {
@@ -58,9 +72,14 @@ public class MqttGenericBindingProvider extends AbstractGenericBindingProvider i
 			throw new BindingConfigParseException(
 					"Missing mqtt binding configuration for item " + itemName);
 		}
-
+		
+//		System.out.println("\n MqttGenericBindingProvider->processBindingConfiguration->context: "+context+":->item:->"+item.getName()+":->bindingConfig:"+bindingConfig);
+		
 		final MqttItemConfig itemConfig = new MqttItemConfig(itemName, bindingConfig);
 		ItemDataHolder	itemDataHolder	=	ItemDataHolder.getItemDataHolder();
+		
+		//CloudChange
+		mqttItemConfigList.put(itemName, itemConfig);
 //		System.out.println("\n ItemDataHolder : "+itemDataHolder);
 //		System.out.println("\n MQTT Item : "+itemConfig);
 
@@ -68,6 +87,7 @@ public class MqttGenericBindingProvider extends AbstractGenericBindingProvider i
 		for (MqttMessageSubscriber subscriber : itemConfig.getMessageSubscribers()) {
 			subscriber.setItemName(item.getName());
 			mqttService.registerMessageConsumer(subscriber.getBroker(), subscriber);
+			System.out.println("\n MqttGenericBindingProvider->processBindingConfiguration->context: "+context+":->item:->"+item.getName()+":->bindingConfig:"+bindingConfig+":->broker->:"+subscriber.getBroker());		
 		}
 
 		// add binding change listener to clean up message consumers on item removal

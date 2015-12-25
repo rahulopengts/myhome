@@ -113,7 +113,7 @@ public class MqttMessageSubscriber extends AbstractMqttMessagePubSub implements
 
 	@Override
 	public void processMessage(String topic, byte[] message) {
-
+System.out.println("\n MqttMessageSubscriber->processMessage->"+topic+":message:->"+new String(message));
 		try {
 
 			if (getTransformationServiceName() != null
@@ -142,11 +142,15 @@ public class MqttMessageSubscriber extends AbstractMqttMessagePubSub implements
 			value = StringUtils.replace(value, "${itemName}", getItemName());
 
 			if (getMessageType().equals(MessageType.COMMAND)) {
+				
 				Command command = getCommand(value);
 				eventPublisher.postCommand(getItemName(), command);
+				System.out.println("\n MqttMessageSubscriber->processMessage->getItemName"+getItemName()+":command:->"+command.toString());
 			} else {
+				
 				State state = getState(value);
 				eventPublisher.postUpdate(getItemName(), state);
+				System.out.println("\n MqttMessageSubscriber->processMessage->getItemName"+getState(value)+":command:->"+state.toString());				
 			}
 		} catch (Exception e) {
 			logger.error("Error processing MQTT message.", e);

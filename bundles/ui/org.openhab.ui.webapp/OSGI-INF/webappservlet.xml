@@ -15,4 +15,5 @@
    <reference bind="setHttpService" cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="dynamic" unbind="unsetHttpService"/>
    <reference bind="setSitemapProvider" cardinality="1..1" interface="org.openhab.model.sitemap.SitemapProvider" name="SitemapProvider" policy="dynamic" unbind="unsetSitemapProvider"/>
    <reference bind="setPageRenderer" cardinality="1..1" interface="org.openhab.ui.webapp.internal.render.PageRenderer" name="PageRenderer" policy="static"/>
+   <!--<reference bind="setModelRepository" cardinality="1..1" interface="org.openhab.model.core.ModelRepository" name="ModelRepository" policy="dynamic" unbind="unsetModelRepository"/>-->
 </scr:component>

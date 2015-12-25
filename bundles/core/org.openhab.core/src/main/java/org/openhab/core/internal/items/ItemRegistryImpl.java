@@ -134,6 +134,7 @@ public class ItemRegistryImpl implements ItemRegistry, ItemsChangeListener {
 			Collection<Item> items = new CopyOnWriteArraySet<Item>(itemProvider.getItems());
 			itemProvider.addItemChangeListener(this);
         	itemMap.put(itemProvider, items);
+        	//System.out.println("\n ItemRegistryImpl->addItemProvider->"+ items.getClass().getCanonicalName());
 			logger.debug("Item provider '{}' has been added.", itemProvider.getClass().getSimpleName());
 			allItemsChanged(itemProvider, null);
 		}
@@ -284,5 +285,10 @@ public class ItemRegistryImpl implements ItemRegistry, ItemsChangeListener {
 					" the naming convention.", item.getName());
 			return false;
 		}
+	}
+	
+	//CloudChange
+	public Map<ItemProvider, Collection<Item>> getItemMap(){
+		return itemMap;
 	}
 }

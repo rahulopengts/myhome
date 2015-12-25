@@ -178,7 +178,9 @@ public class PersistenceManager extends AbstractEventSubscriber implements Model
 	 */
 	private void startEventHandling(String modelName) {
 		PersistenceModel model = (PersistenceModel) modelRepository.getModel(modelName + ".persist");
+		//System.out.println("\nPersistenceManager->startEventHandling-> modelName->"+modelName+"->modelRepository "+modelRepository);
 		if(model!=null) {
+			//System.out.println("\nPersistenceManager->startEventHandling-> model.getConfigs() "+model.getConfigs());
 			persistenceConfigurations.put(modelName, model.getConfigs());
 			defaultStrategies.put(modelName, model.getDefaults());
 			initializeItems(model, modelName);
@@ -206,6 +208,7 @@ public class PersistenceManager extends AbstractEventSubscriber implements Model
 	}
 	
 	private void initializeItems(PersistenceModel model, String modelName) {
+		//System.out.println("\nPersistenceManager->initializeItems-> "+model.getConfigs());
 		for(PersistenceConfiguration config : model.getConfigs()) {
 			if(hasStrategy(modelName, config, GlobalStrategies.RESTORE)) {
 				for(Item item : getAllItems(config)) {
@@ -372,6 +375,7 @@ public class PersistenceManager extends AbstractEventSubscriber implements Model
 		if(item.getState().equals(UnDefType.NULL) && item instanceof GenericItem) {
 			for(Entry<String, List<PersistenceConfiguration>> entry : persistenceConfigurations.entrySet()) {
 				String serviceName = entry.getKey();
+				//System.out.println("\n PersistenceManager->initialize->serviceName->"+serviceName);
 				for(PersistenceConfiguration config : entry.getValue()) {
 					if(hasStrategy(serviceName, config, GlobalStrategies.RESTORE)) {
 						if(appliesToItem(config, item)) {
@@ -386,6 +390,7 @@ public class PersistenceManager extends AbstractEventSubscriber implements Model
 									GenericItem genericItem = (GenericItem) item;
 									genericItem.removeStateChangeListener(this);
 									genericItem.setState(historicItem.getState());
+									//System.out.println("\n PersistenceManager->initialize->serviceName->"+item.getName()+"->:State:->>"+historicItem.getState());
 									genericItem.addStateChangeListener(this);
 									logger.debug("Restored item state from '{}' for item '{}' -> '{}'", 
 											new Object[] { DateFormat.getDateTimeInstance().format(historicItem.getTimestamp()), 

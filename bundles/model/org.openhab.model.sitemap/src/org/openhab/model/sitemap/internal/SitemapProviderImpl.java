@@ -8,6 +8,8 @@
  */
 package org.openhab.model.sitemap.internal;
 
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
 import org.openhab.model.core.ModelRepository;
 import org.openhab.model.sitemap.Sitemap;
 import org.openhab.model.sitemap.SitemapProvider;
@@ -26,6 +28,7 @@ public class SitemapProviderImpl implements SitemapProvider {
 	
 	private ModelRepository modelRepo = null;
 	
+
 	public void setModelRepository(ModelRepository modelRepo) {
 		this.modelRepo = modelRepo;
 	}
@@ -39,7 +42,10 @@ public class SitemapProviderImpl implements SitemapProvider {
 	 */
 	public Sitemap getSitemap(String sitemapName) {
 		if(modelRepo!=null) {
+			//System.out.println("\n***SiteMapProviderImpl->getSitemap->"+modelRepo.getName());
 			Sitemap sitemap = (Sitemap) modelRepo.getModel(sitemapName + ".sitemap");
+			  
+			  
 			if(sitemap!=null) {
 				return sitemap;
 			} else {
@@ -52,4 +58,14 @@ public class SitemapProviderImpl implements SitemapProvider {
 		}
 	}
 
+	public void iterate(EObject sitemap){
+		final TreeIterator<EObject> contentIterator=sitemap.eAllContents();
+		
+		while (contentIterator.hasNext()) {
+			final EObject next=contentIterator.next();
+		   
+		
+		}
+
+	}
 }

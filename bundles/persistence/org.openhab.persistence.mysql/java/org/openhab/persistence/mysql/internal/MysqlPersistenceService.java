@@ -443,6 +443,7 @@ public class MysqlPersistenceService implements QueryablePersistenceService, Man
 	 */
 	public void updated(Dictionary<String, ?> config) throws ConfigurationException {
 		logger.debug("mySQL configuration starting");
+		System.out.println("\n MysqlPersistenceService->updated->");
 		if (config != null) {
 			Enumeration<String> keys = config.keys();
 

@@ -148,6 +148,7 @@
       };
 
       OH.asyncLoad = function AsyncLoad(widgetId) {
+    	  
         WA.Request("../%servletname%?sitemap=%sitemap%&w=" + widgetId, null, -1, true, null);
       };
 
@@ -160,6 +161,7 @@
       OH.colorChange = function colorChange() {
         var now = new Date().getTime();
         if (now - OH.colorpicker.lastColorChange > 300) {
+        	
           var cmd = $.minicolors.hsbString($('#colorPickerInput'));
           WA.Request("/CMD?" + OH.colorpicker.colorItem + "=" + cmd, null, null);
           OH.colorpicker.lastColorChange = now;

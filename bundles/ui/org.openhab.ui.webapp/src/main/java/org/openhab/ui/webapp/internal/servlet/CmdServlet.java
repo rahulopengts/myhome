@@ -14,18 +14,32 @@ import java.util.Hashtable;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.eclipse.equinox.internal.event.EventComponent;
 import org.openhab.core.events.EventPublisher;
+import org.openhab.core.internal.events.EventPublisherImpl;
 import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.items.SwitchItem;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.TypeParser;
+import org.openhab.model.core.internal.folder.FolderObserver;
+import org.openhab.ui.webapp.cloud.exception.CloudException;
+import org.openhab.ui.webapp.cloud.exception.CloudExceptionManager;
+import org.openhab.ui.webapp.cloud.exception.CloudMessageConstants;
+import org.openhab.ui.webapp.cloud.session.CloudSessionManager;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.openhab.core.event.handler.EventManager;
 
 /**
  * This servlet receives events from the web app and sends these as
@@ -75,12 +89,28 @@ public class CmdServlet extends BaseServlet {
 	 */
 	public void service(ServletRequest req, ServletResponse res)
 			throws ServletException, IOException {
+		//System.out.println("\nCmdServlet->service->eventPublisher->"+eventPublisher.getClass().getCanonicalName());
+		
+		if(FolderObserver.CLOUD_MODE){
+			try{
+				validateSession((HttpServletRequest)req,(HttpServletResponse)res);
+				eventPublisher	=	(EventPublisher)CloudSessionManager.getAttribute(CloudSessionManager.getSession((HttpServletRequest)req, (HttpServletResponse)res), CloudSessionManager.EVENTPUBLISHER);
+				//EventPublisher eventPublisher	=	new EventPublisherImpl();
+				EventAdmin	eventAdmin	=	new EventComponent();
+				((EventPublisherImpl)eventPublisher).setEventAdmin(eventAdmin);
+			
+			} catch (Throwable e){
+				e.printStackTrace();
+				throw new ServletException();
+			}
+		}
 		for(Object key : req.getParameterMap().keySet()) {
 			String itemName = key.toString();
 			
 			if(!itemName.startsWith("__")) { // all additional webapp params start with "__" and should be ignored
 				String commandName = req.getParameter(itemName);
 				try {
+					System.out.println("\n CmdServlet->service-> DOES NOT START WITH->_ And Submitted Command Name Is "+commandName);
 					Item item = itemRegistry.getItem(itemName);
 					
 					// we need a special treatment for the "TOGGLE" command of switches;
@@ -90,9 +120,22 @@ public class CmdServlet extends BaseServlet {
 						commandName = OnOffType.ON.equals(item.getStateAs(OnOffType.class)) ? "OFF" : "ON";
 					}
 					
+					
+					
 					Command command = TypeParser.parseCommand(item.getAcceptedCommandTypes(), commandName);
+					
+					
+					System.out.println("\n CmdServlet->service-> Command:"+command);
 					if(command!=null) {
+						System.out.println("\n CmdServlet->service-> Command is Before :"+commandName+" :\n Command Type :"+command.getClass().getSimpleName());
+						
+						if(FolderObserver.CLOUD_MODE){
+							EventManager	eventManager	=	new EventManager();
+							eventManager.publishData(itemName, command, itemRegistry);
+						}
+						
 						eventPublisher.sendCommand(itemName, command);
+						System.out.println("\n CmdServlet->service-> Command is "+commandName+" :\n Command Type :"+command.getClass().getSimpleName());
 					} else {
 						logger.warn("Received unknown command '{}' for item '{}'", commandName, itemName);						
 					}
@@ -102,6 +145,77 @@ public class CmdServlet extends BaseServlet {
 			}
 		}
 	}
-	
 
+	private void validateSession(HttpServletRequest req,HttpServletResponse res) throws ServletException{
+		//EventPublisherImpl
+		try{
+			HttpSession	session	=	CloudSessionManager.getSession(req, res);
+			
+			itemRegistry	=	(ItemRegistry)CloudSessionManager.getAttribute(session, CloudSessionManager.ITEMREGISTRY);
+			if(itemRegistry==null){
+				CloudExceptionManager.throwException(CloudMessageConstants.ATTRIBUTE_NULL, null, CloudSessionManager.ITEMREGISTRY+"is null");
+			}
+		} catch (CloudException excp){
+			excp.printStackTrace();
+			throw new ServletException(CloudSessionManager.ITEMREGISTRY+"is null");
+		}
+		//itemRegistry		
+		
+//		EventPublisher eventPublisher	=	new EventPublisherImpl();
+//		EventAdmin	eventAdmin	=	new EventComponent();
+//		((EventPublisherImpl)eventPublisher).setEventAdmin(eventAdmin);
+	}
+
+//	at org.openhab.persistence.rrd4j.internal.RRD4jService.store(RRD4jService.java:154)
+//	at org.openhab.core.persistence.internal.PersistenceManager.handleStateEvent(PersistenceManager.java:243)
+//	at org.openhab.core.persistence.internal.PersistenceManager.stateChanged(PersistenceManager.java:222)
+//	at org.openhab.core.items.GenericItem.notifyListeners(GenericItem.java:112)
+//	at org.openhab.core.items.GenericItem.setState(GenericItem.java:100)
+//	at org.openhab.core.items.GroupItem.stateUpdated(GroupItem.java:220)
+//	at org.openhab.core.items.GenericItem.notifyListeners(GenericItem.java:108)
+//	at org.openhab.core.items.GenericItem.setState(GenericItem.java:100)
+//	at org.openhab.core.items.GroupItem.stateUpdated(GroupItem.java:220)
+//	at org.openhab.core.items.GenericItem.notifyListeners(GenericItem.java:108)
+//	at org.openhab.core.items.GenericItem.setState(GenericItem.java:100)
+//	at org.openhab.core.autoupdate.internal.AutoUpdateBinding.postUpdate(AutoUpdateBinding.java:110)
+//	at org.openhab.core.autoupdate.internal.AutoUpdateBinding.receiveCommand(AutoUpdateBinding.java:81)
+//	at org.openhab.core.events.AbstractEventSubscriber.handleEvent(AbstractEventSubscriber.java:42)
+//	at org.eclipse.equinox.internal.event.EventHandlerWrapper.handleEvent(EventHandlerWrapper.java:197)
+//	at org.eclipse.equinox.internal.event.EventHandlerTracker.dispatchEvent(EventHandlerTracker.java:197)
+//	at org.eclipse.equinox.internal.event.EventHandlerTracker.dispatchEvent(EventHandlerTracker.java:1)
+//	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+//	at org.eclipse.osgi.framework.eventmgr.ListenerQueue.dispatchEventSynchronous(ListenerQueue.java:148)
+//	at org.eclipse.equinox.internal.event.EventAdminImpl.dispatchEvent(EventAdminImpl.java:135)
+//	at org.eclipse.equinox.internal.event.EventAdminImpl.sendEvent(EventAdminImpl.java:78)
+//	at org.eclipse.equinox.internal.event.EventComponent.sendEvent(EventComponent.java:39)
+//	at org.openhab.core.internal.events.EventPublisherImpl.sendCommand(EventPublisherImpl.java:61)
+//	at org.openhab.ui.webapp.internal.servlet.CmdServlet.service(CmdServlet.java:129)
+//	at org.eclipse.equinox.http.servlet.internal.ServletRegistration.service(ServletRegistration.java:61)
+//	at org.eclipse.equinox.http.servlet.internal.ProxyServlet.processAlias(ProxyServlet.java:128)
+//	at org.eclipse.equinox.http.servlet.internal.ProxyServlet.service(ProxyServlet.java:60)
+//	at javax.servlet.http.HttpServlet.service(HttpServlet.java:848)
 }
+
+
+//		at org.openhab.binding.mqtt.internal.MqttMessagePublisher.publish(MqttMessagePublisher.java:191) ~[org.openhab.binding.mqtt/:na]
+//		at org.openhab.binding.mqtt.internal.MqttEventBusBinding.receiveCommand(MqttEventBusBinding.java:135) [org.openhab.binding.mqtt/:na]
+//		at org.openhab.core.events.AbstractEventSubscriber.handleEvent(AbstractEventSubscriber.java:42) [org.openhab.core/:na]
+//		at org.eclipse.equinox.internal.event.EventHandlerWrapper.handleEvent(EventHandlerWrapper.java:197) [org.eclipse.equinox.event_1.2.200.v20120522-2049.jar:na]
+//		at org.eclipse.equinox.internal.event.EventHandlerTracker.dispatchEvent(EventHandlerTracker.java:197) [org.eclipse.equinox.event_1.2.200.v20120522-2049.jar:na]
+//		at org.eclipse.equinox.internal.event.EventHandlerTracker.dispatchEvent(EventHandlerTracker.java:1) [org.eclipse.equinox.event_1.2.200.v20120522-2049.jar:na]
+//		at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230) [org.eclipse.osgi_3.8.2.v20130124-134944.jar:na]
+//		at org.eclipse.osgi.framework.eventmgr.ListenerQueue.dispatchEventSynchronous(ListenerQueue.java:148) [org.eclipse.osgi_3.8.2.v20130124-134944.jar:na]
+//		at org.eclipse.equinox.internal.event.EventAdminImpl.dispatchEvent(EventAdminImpl.java:135) [org.eclipse.equinox.event_1.2.200.v20120522-2049.jar:na]
+//		at org.eclipse.equinox.internal.event.EventAdminImpl.sendEvent(EventAdminImpl.java:78) [org.eclipse.equinox.event_1.2.200.v20120522-2049.jar:na]
+//		at org.eclipse.equinox.internal.event.EventComponent.sendEvent(EventComponent.java:39) [org.eclipse.equinox.event_1.2.200.v20120522-2049.jar:na]
+//		at org.openhab.core.internal.events.EventPublisherImpl.sendCommand(EventPublisherImpl.java:61) [org.openhab.core/:na]
+//		at org.openhab.ui.webapp.internal.servlet.CmdServlet.service(CmdServlet.java:129) [org.openhab.ui.webapp/:na]
+//		at org.eclipse.equinox.http.servlet.internal.ServletRegistration.service(ServletRegistration.java:61) [org.eclipse.equinox.http.servlet_1.1.300.v20120912-130548.jar:na]
+//		at org.eclipse.equinox.http.servlet.internal.ProxyServlet.processAlias(ProxyServlet.java:128) [org.eclipse.equinox.http.servlet_1.1.300.v20120912-130548.jar:na]
+//		at org.eclipse.equinox.http.servlet.internal.ProxyServlet.service(ProxyServlet.java:60) [org.eclipse.equinox.http.servlet_1.1.300.v20120912-130548.jar:na]
+//		at javax.servlet.http.HttpServlet.service(HttpServlet.java:848) [javax.servlet_3.0.0.v201112011016.jar:na]
+//		at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:598) [org.eclipse.jetty.servlet_8.1.3.v20120522.jar:8.1.3.v20120522]
+//		at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:486) [org.eclipse.jetty.servlet_8.1.3.v20120522.jar:8.1.3.v20120522]
+//		at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:231) [org.eclipse.jetty.server_8.1.3.v20120522.jar:8.1.3.v20120522]
+//		at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1065) [org.eclipse.jetty.server_8.1.3.v20120522.jar:8.1.3.v20120522]
+//		at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:413) [org.eclipse.jetty.servlet_8.1.3.v20120522.jar:8.1.3.v20120522]

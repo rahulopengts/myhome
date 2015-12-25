@@ -42,6 +42,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 	List<WidgetRenderer> widgetRenderers = new ArrayList<WidgetRenderer>();
 
 	public void addWidgetRenderer(WidgetRenderer widgetRenderer) {
+		System.out.println("\n PageRenderer->addWidgetRenderer-> WidgetRenderer ->"+widgetRenderer);
 		widgetRenderers.add(widgetRenderer);
 	}
 
@@ -61,7 +62,7 @@ public class PageRenderer extends AbstractWidgetRenderer {
 	 * @throws RenderException if an error occurs during the processing
 	 */
 	public StringBuilder processPage(String id, String sitemap, String label, EList<Widget> children, boolean async) throws RenderException {
-		
+		System.out.println("PageRenderer - > processPage widget  -> ");
 		String snippet = getSnippet(async ? "layer" : "main");
 		snippet = snippet.replaceAll("%id%", id);
 
@@ -155,6 +156,8 @@ public class PageRenderer extends AbstractWidgetRenderer {
 			return null;
 
 		for(WidgetRenderer renderer : widgetRenderers) {
+			System.out.println("PageRenderer - > renderWidget widget  -> "+w);
+			System.out.println("PageRenderer - > renderWidget renderer-> "+renderer);
 			if(renderer.canRender(w)) {
 				return renderer.renderWidget(w, sb);
 			}

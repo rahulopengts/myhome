@@ -17,5 +17,5 @@ Import-Package: org.apache.commons.lang,
  org.openhab.core.types,
  org.osgi.framework
 Export-Package: org.openhab.core.library.items,org.openhab.core.librar
- y.types
+ y.types,org.openhab.core.library
 Service-Component: OSGI-INF/itemfactory.xml

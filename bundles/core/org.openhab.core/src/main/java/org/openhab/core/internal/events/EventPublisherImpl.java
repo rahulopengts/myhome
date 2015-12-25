@@ -41,6 +41,9 @@ public class EventPublisherImpl implements EventPublisher {
 	
 	public void setEventAdmin(EventAdmin eventAdmin) {
 		this.eventAdmin = eventAdmin;
+		System.out.println("\n EventPublisheImpl : setEventAdmin ->: "+eventAdmin.getClass().getName());
+//		String s	=	null;
+//		s.toString();
 	}
 
 	public void unsetEventAdmin(EventAdmin eventAdmin) {
@@ -100,6 +103,7 @@ public class EventPublisherImpl implements EventPublisher {
 	}
 
 	private String createTopic(EventType type, String itemName) {
+		//System.out.println("\n CreateCommand : Topic "+TOPIC_PREFIX + TOPIC_SEPERATOR + type + TOPIC_SEPERATOR + itemName);
 		return TOPIC_PREFIX + TOPIC_SEPERATOR + type + TOPIC_SEPERATOR + itemName;
 	}
 	

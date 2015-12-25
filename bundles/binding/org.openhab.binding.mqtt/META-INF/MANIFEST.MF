@@ -26,5 +26,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/mqtt-*.xml
 Bundle-ClassPath: .
 Require-Bundle: org.openhab.io.transport.mqtt;bundle-version="1.3.0"
-Export-Package: org.openhab.binding.mqtt
+Export-Package: org.openhab.binding.mqtt,org.openhab.binding.mqtt.internal
 Bundle-Activator: org.openhab.binding.mqtt.internal.MqttActivator

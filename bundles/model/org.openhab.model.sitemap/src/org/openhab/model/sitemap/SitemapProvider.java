@@ -8,6 +8,7 @@
  */
 package org.openhab.model.sitemap;
 
+import org.openhab.model.core.ModelRepository;
 import org.openhab.model.sitemap.Sitemap;
 
 public interface SitemapProvider {
@@ -19,5 +20,8 @@ public interface SitemapProvider {
 	 * @return the object model tree, null if it is not found
 	 */
 	public Sitemap getSitemap(String sitemapName);
+	
 
+	//CloudChange
+	public void setModelRepository(ModelRepository modelRepo);
 }

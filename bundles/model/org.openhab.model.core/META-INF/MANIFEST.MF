@@ -24,4 +24,4 @@ Import-Package: com.google.common.base,
  org.slf4j;version="1.5.11"
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/folderobserver.xml, OSGI-INF/modelrepository.xml
-Export-Package: org.openhab.model.core
+Export-Package: org.openhab.model.core,org.openhab.model.core.internal,org.openhab.model.core.internal.folder

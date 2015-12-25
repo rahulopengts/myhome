@@ -75,4 +75,7 @@ public interface ModelRepository {
 	public void removeModelRepositoryChangeListener(
 			ModelRepositoryChangeListener listener);
 
+	public void setName(String name);
+	
+	public String getName();
 }

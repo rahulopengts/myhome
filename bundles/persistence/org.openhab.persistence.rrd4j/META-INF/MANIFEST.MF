@@ -25,3 +25,4 @@ Bundle-ClassPath: .,
  lib/rrd4j-2.1.1.jar
 Service-Component: OSGI-INF/rrd4j.xml, OSGI-INF/chartservlet.xml
 Bundle-Activator: org.openhab.persistence.rrd4j.internal.RRD4jActivator
+Export-Package: org.openhab.persistence.rrd4j.internal

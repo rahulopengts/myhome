@@ -59,6 +59,16 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 	/** to keep track of all binding config readers */
 	private Map<String, BindingConfigReader> bindingConfigReaders = new HashMap<String, BindingConfigReader>();
 
+	public Map<String, BindingConfigReader> getBindingConfigReaders() {
+		return bindingConfigReaders;
+	}
+
+
+	public void setBindingConfigReaders(
+			Map<String, BindingConfigReader> bindingConfigReaders) {
+		this.bindingConfigReaders = bindingConfigReaders;
+	}
+
 	private ModelRepository modelRepository = null;
 	
 	private Collection<ItemFactory> itemFactorys = new ArrayList<ItemFactory>();
@@ -88,6 +98,7 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 	 */
 	public void addItemFactory(ItemFactory factory) {
 		itemFactorys.add(factory);
+		//System.out.println("\nGenricItemProvider->addItemFactory->"+factory.getClass().getCanonicalName());
 		dispatchBindingsPerItemType(null, factory.getSupportedItemTypes());
 	}
 	
@@ -102,6 +113,10 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 	
 	public void addBindingConfigReader(BindingConfigReader reader) {
 		if (!bindingConfigReaders.containsKey(reader.getBindingType())) {
+			System.out.println("\nGenericItemProvide->addBindingConfigReader->"+reader.getBindingType());
+//			String s=null;
+//			
+//			s.toString();
 			bindingConfigReaders.put(reader.getBindingType(), reader);
 			dispatchBindingsPerType(reader, new String[] {reader.getBindingType() });
 		} else {
@@ -122,8 +137,12 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 	 */
 	@Override
 	public Collection<Item> getItems() {
+		//System.out.println("\n"+Thread.currentThread()+"GenericItemProvider->getItems->"+modelRepository);
 		List<Item> items = new ArrayList<Item>();
-		for (String name : modelRepository.getAllModelNamesOfType("items")) {
+		Iterable<String> str	=	modelRepository.getAllModelNamesOfType("items");
+		//System.out.println("\n GenericItemProvider->getItems->str "+str);
+		//for (String name : modelRepository.getAllModelNamesOfType("items")) {
+		for (String name : str) {
 			items.addAll(getItemsFromModel(name));
 		}
 		return items;
@@ -283,7 +302,11 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 						for (String itemType : itemTypes) {
 							if (itemType.equals(modelItem.getType())) {
 								Item item = createItemFromModelItem(modelItem);
-								internalDispatchBindings(reader, modelName, item, modelItem.getBindings());									
+								internalDispatchBindings(reader, modelName, item, modelItem.getBindings());
+								System.out.println("\nGenericItemProvider->dispatchBindingsPerItemType->reader->"+reader);
+								System.out.println("\nGenericItemProvider->dispatchBindingsPerItemType->modelName->"+modelName);
+								System.out.println("\nGenericItemProvider->dispatchBindingsPerItemType->item->"+item);
+								System.out.println("\nGenericItemProvider->dispatchBindingsPerItemType->modelItem.getBindings()->"+modelItem.getBindings());
 							}
 						}
 					}
@@ -306,6 +329,7 @@ public class GenericItemProvider implements ItemProvider, ModelRepositoryChangeL
 							for (String bindingType : bindingTypes) {
 								if (bindingType.equals(modelBinding.getType())) {
 									Item item = createItemFromModelItem(modelItem);
+									System.out.println("\nGenericItemProvidder->dispatchBindingsPerType->item->"+item.getName());	
 									internalDispatchBindings(reader, modelName, item, modelItem.getBindings());									
 								}
 							}

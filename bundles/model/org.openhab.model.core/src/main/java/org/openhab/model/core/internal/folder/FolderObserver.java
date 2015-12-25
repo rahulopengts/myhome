@@ -82,19 +82,25 @@ public class FolderObserver extends Thread implements ManagedService {
 		this.modelRepo = null;
 	}
 
+	public static final boolean CLOUD_MODE	=	true;
+	//Also change MqttService.update method for cloud
 	@Override
 	public void run() {
+if(!CLOUD_MODE){
+		//System.out.println("\n FolderObserver : ");
 		while(!folderRefreshMap.isEmpty()) { // keep the thread running as long as there are folders to observe
+			
 			try {
 				for(String foldername : folderRefreshMap.keySet()) {
 					// if folder has been checked at least once and it is not time yet to refresh, skip
 					if( lastFileNames.get(foldername) != null  && 
-							(refreshCount % folderRefreshMap.get(foldername) > 0)) {										
+							(refreshCount % folderRefreshMap.get(foldername) > 0)) {
+						
 						logger.debug("skipping refresh of folder '{}' folderRefreshMap={}",
 								foldername, folderRefreshMap.get(foldername));
 						continue;
 					} 
-					
+					//System.out.println("\n FolderObserver->run->"+foldername+"::"+folderRefreshMap.get(foldername));
 					logger.debug("Refreshing folder '{}'", foldername);
 					checkFolder(foldername);
 				}
@@ -113,15 +119,17 @@ public class FolderObserver extends Thread implements ManagedService {
 				break;
 			}
 		}
+}
 	}
 	
-	private void checkFolder(String foldername) {
+	//CloudChange
+	public void checkFolder(String foldername) {
 		File folder = getFolder(foldername);
 		if(!folder.exists()) {
 			return;
 		}
 		String[] extensions = folderFileExtMap.get(foldername);
-		
+		//System.out.println("\n FolderObserver -> checkFolder-> extensions "+extensions[0]+":"+extensions[0]);
 		// check current files and add or refresh them accordingly
 		Set<String> currentFileNames = new HashSet<String>();
 		for(File file : folder.listFiles()) {
@@ -129,6 +137,7 @@ public class FolderObserver extends Thread implements ManagedService {
 			if(!file.getName().contains(".")) continue;
 			if(file.getName().startsWith(".")) continue;
 			
+			//System.out.println("\n FolderObserver -> checkFolder-> fileName "+file.getName());
 			// if there is an extension filter defined, continue if the file has a different extension
 			String fileExt = getExtension(file.getName());
 			if(extensions!=null && extensions.length>0 && !ArrayUtils.contains(extensions, fileExt)) continue;
@@ -139,6 +148,7 @@ public class FolderObserver extends Thread implements ManagedService {
 			if(FileUtils.isFileNewer(file, timeLastCheck)) {
 				if(modelRepo!=null) {
 					try {
+						//System.out.println("\n FolderObserver -> checkFolder-> addOrRefreshmodel "+file.getAbsolutePath());
 						if(modelRepo.addOrRefreshModel(file.getName(), FileUtils.openInputStream(file))) {
 							lastCheckedMap.put(file.getName(), new Date().getTime());							
 						}
@@ -177,10 +187,11 @@ public class FolderObserver extends Thread implements ManagedService {
 			lastCheckedMap.clear();
 			folderFileExtMap.clear();
 			folderRefreshMap.clear();
-			
+			//System.out.println("\n FolderObserver->updated->config "+config);
 			Enumeration keys = config.keys();
 			while (keys.hasMoreElements()) {
 				String foldername = (String) keys.nextElement();
+				//System.out.println("\n FolderObserver->updated->Dictionary "+foldername+"::"+(String) config.get(foldername));				
 				if(foldername.equals("service.pid")) continue;
 				String[] values = ((String) config.get(foldername)).split(",");
 				try {
@@ -198,6 +209,7 @@ public class FolderObserver extends Thread implements ManagedService {
 								// make sure that we notify the sleeping thread and directly refresh the folders
 								synchronized (FolderObserver.this) {
 									notify();
+									//System.out.println("\n FoldeObserver->CheckFolder ->"+foldername);
 									checkFolder(foldername);
 								}
 							}
@@ -238,6 +250,7 @@ public class FolderObserver extends Thread implements ManagedService {
 	private File getFolder(String foldername) {
 		File folder = new File(ConfigDispatcher.getConfigFolder()
 				+ File.separator + foldername);
+		//System.out.println("\n FolderObserver -> getFolder-> extensions "+foldername+":"+folder.getPath());
 		return folder;
 	}
 

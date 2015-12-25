@@ -12,6 +12,8 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
+
 import org.apache.commons.lang.StringUtils;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.io.transport.mqtt.internal.MqttBrokerConnection;
@@ -41,6 +43,8 @@ public class MqttService implements ManagedService {
 	public void updated(Dictionary<String, ?> properties)
 			throws ConfigurationException {
 
+		boolean cloud=true;
+		if(!cloud){
 		// load broker configurations from configuration file
 		if (properties == null || properties.isEmpty()) {
 			return;
@@ -68,6 +72,9 @@ public class MqttService implements ManagedService {
 			String name = subkeys[0].toLowerCase();
 			String property = subkeys[1];
 
+			System.out.println("\nMqttService->updated->key->"+key);
+			System.out.println("\nMqttService->updated->value->"+value);
+			System.out.println("\nMqttService->updated->property->"+subkeys[1]);
 			if (StringUtils.isBlank(value)) {
 				logger.trace("Property is empty: {}", key);
 				continue;
@@ -109,6 +116,91 @@ public class MqttService implements ManagedService {
 
 		for (MqttBrokerConnection con : brokerConnections.values()) {
 			try {
+				System.out.println("\nMqttService->updated->BrokerConnections : "+con);
+				con.start();
+			} catch (Exception e) {
+				logger.error("Error starting broker connection", e);
+			}
+		}
+		}
+	}
+
+	
+	public void updatedCloud(Dictionary<String, ?> properties)
+			throws ConfigurationException {
+
+		// load broker configurations from configuration file
+		if (properties == null || properties.isEmpty()) {
+			return;
+		}
+
+		Enumeration<String> keys = properties.keys();
+		while (keys.hasMoreElements()) {
+
+			String key = keys.nextElement();
+
+			if (key.equals("service.pid")) {
+				// ignore the only non-broker property..
+				continue;
+			}
+
+			String[] subkeys = key.split("\\.");
+			if (subkeys.length != 2) {
+				logger.debug(
+						"MQTT Broker property '{}' should have the format 'broker.propertykey'",
+						key);
+				continue;
+			}
+
+			String value = (String) properties.get(key);
+			String name = subkeys[0].toLowerCase();
+			String property = subkeys[1];
+
+			System.out.println("\nMqttService->updated->key->"+key);
+			System.out.println("\nMqttService->updated->value->"+value);
+			System.out.println("\nMqttService->updated->property->"+subkeys[1]);
+			if (StringUtils.isBlank(value)) {
+				logger.trace("Property is empty: {}", key);
+				continue;
+			} else {
+				logger.trace("Processing property: {} = {}", key, value);
+			}
+
+			MqttBrokerConnection conn = brokerConnections.get(name);
+			if (conn == null) {
+				conn = new MqttBrokerConnection(name);
+				brokerConnections.put(name, conn);
+			}
+
+			if (property.equals("url")) {
+				conn.setUrl(value);
+			} else if (property.equals("user")) {
+				conn.setUser(value);
+			} else if (property.equals("pwd")) {
+				conn.setPassword(value);
+			} else if (property.equals("qos")) {
+				conn.setQos(Integer.parseInt(value));
+			} else if (property.equals("retain")) {
+				conn.setRetain(Boolean.parseBoolean(value));
+			} else if (property.equals("async")) {
+				conn.setAsync(Boolean.parseBoolean(value));
+			} else if (property.equals("clientId")) {
+				conn.setClientId(value);
+			} else if (property.equals("lwt")) {
+				MqttWillAndTestament will = MqttWillAndTestament.fromString(value);
+				logger.debug("Setting last will: {}", will);
+				conn.setLastWill(will);
+			} else if (property.equals("keepAlive")) {
+				conn.setKeepAliveInterval(Integer.parseInt(value));
+			} else {
+				logger.warn("Unrecognized property: {}", key);
+			}
+		}
+		logger.info("MQTT Service initialization completed.");
+
+		for (MqttBrokerConnection con : brokerConnections.values()) {
+			try {
+				System.out.println("\nMqttService->updated->BrokerConnections : "+con);
 				con.start();
 			} catch (Exception e) {
 				logger.error("Error starting broker connection", e);
@@ -116,6 +208,7 @@ public class MqttService implements ManagedService {
 		}
 	}
 
+	
 	/**
 	 * Start service.
 	 */
@@ -214,6 +307,11 @@ public class MqttService implements ManagedService {
 	public void setEventPublisher(EventPublisher eventPublisher) {
 		this.eventPublisher = eventPublisher;
 	}
+
+	public EventPublisher getEventPublisher() {
+		return this.eventPublisher;
+	}
+
 
 	/**
 	 * Remove the publisher to use for publishing openHAB updates.

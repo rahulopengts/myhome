@@ -10,6 +10,7 @@ package org.openhab.ui.webapp.render;
 
 import org.eclipse.emf.common.util.EList;
 import org.openhab.model.sitemap.Widget;
+import org.openhab.ui.items.ItemUIRegistry;
 
 /**
  * This interface must be implemented by classes, which can render HTML for the WebApp UI for certain widget types.
@@ -38,4 +39,6 @@ public interface WidgetRenderer {
 	 */
 	public EList<Widget> renderWidget(Widget w, StringBuilder sb) throws RenderException;
 
+	//CloudChange
+	public void setItemUIRegistry(ItemUIRegistry itemUIRegistry);
 }

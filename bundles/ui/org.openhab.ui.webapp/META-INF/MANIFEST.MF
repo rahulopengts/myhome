@@ -29,7 +29,33 @@ Import-Package: org.apache.commons.io,
  org.osgi.framework,
  org.osgi.service.component,
  org.osgi.service.http,
- org.slf4j
+ org.slf4j,
+ org.openhab.ui.internal.items,
+ org.openhab.model.item.internal,
+ org.openhab.core.internal.items,
+ org.openhab.model.core.internal,
+ org.openhab.model.core,
+ org.openhab.core.library,
+ org.eclipse.core.runtime,
+ org.openhab.model.items,
+ org.openhab.model.core.internal.folder,
+ org.quartz,
+ org.quartz.impl,
+ org.quartz.impl.matchers,
+ org.quartz.utils,
+ org.openhab.model.sitemap.internal,
+ org.openhab.core.persistence,
+ org.openhab.persistence.rrd4j.internal,
+ org.openhab.core.persistence.internal,
+ org.openhab.core.internal.events,
+ org.osgi.service.event,
+ org.eclipse.equinox.internal.event,
+ org.openhab.config.core,
+ org.openhab.io.transport.mqtt,
+ org.openhab.io.transport.mqtt.internal,
+ org.openhab.binding.mqtt.internal,
+ org.openhab.model.item.binding,
+ org.eclipse.paho.client.mqttv3
 Bundle-SymbolicName: org.openhab.ui.webapp
 Bundle-DocURL: http://www.openhab.org
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -41,5 +67,8 @@ Service-Component: OSGI-INF/webappservlet.xml, OSGI-INF/pagerenderer.xml,
  OSGI-INF/chartrenderer.xml, OSGI-INF/videorenderer.xml,
  OSGI-INF/webviewrenderer.xml, OSGI-INF/setpointrenderer.xml,
  OSGI-INF/colorpickerrenderer.xml
+Bundle-ClassPath: .,
+ lib/mqtt-client-0.4.0.jar,lib/guava-18.0.jar
 Export-Package: org.openhab.ui.webapp.render,org.openhab.ui.webapp.internal.render,org.openhab.ui.webapp.internal,org.openhab.ui.webapp.internal.servlet
 Require-Bundle: javax.servlet
+ 

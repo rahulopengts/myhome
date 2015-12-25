@@ -7,7 +7,7 @@
 	</appender>
 
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
-		<file>${openhab.logdir:-logs}/openhab.log</file>
+		<file>D:/Home_Auto/raspberry/Latest/openHAB_Installer/openhab-master/distribution/openhabhome/logs/openhab1.log</file>
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%-5level] [%-30.30logger{36}:%-5line] - %msg%n</pattern>
 		</encoder>
@@ -28,32 +28,29 @@
 		</encoder>
 	</appender>
 
-	<logger name="runtime.busevents" level="ERROR" additivity="false">
-		<appender-ref ref="EVENTFILE" />
-		<appender-ref ref="STDOUT" />
-	</logger>
 
-	<logger name="org.openhab" level="ERROR" />
-	<logger name="org.openhab.binding.knx" level="ERROR" />
-	<logger name="org.openhab.binding.onewire" level="ERROR" />
-	<logger name="org.openhab.ui" level="ERROR" />
-	<logger name="org.openhab.ui.webapp" level="ERROR" />
-	<logger name="org.openhab.ui.webapp.internal.servlet" level="ERROR" />
-	<logger name="org.openhab.io.net" level="ERROR" />
-	<logger name="org.openhab.core.autoupdate" level="ERROR" />
-	<logger name="org.openhab.core.persistence.internal" level="ERROR" />
-	<logger name="org.openhab.core.transform.internal.service.MapTransformationService" level="ERROR" />
-	<logger name="org.openhab.binding.vdr" level="ERROR" />
-	<logger name="org.openhab.model.core.internal.folder" level="ERROR" />
-	<logger name="org.openhab.io.dropbox" level="ERROR" />
+	<logger name="org.openhab" level="DEBUG" />
 
- 
+	<logger name="org.openhab.model.sitemap.internal" level="DEBUG" />
+	<logger name="org.openhab.core.persistence" level="DEBUG" />
+	<logger name="org.openhab.persistence.rrd4j.internal" level="DEBUG" />
+	<logger name="org.openhab.core.persistence.internal" level="DEBUG" />
+	<logger name="org.openhab.core.internal.events" level="DEBUG" />
+
+	<logger name="org.osgi.service.event" level="DEBUG" />
+	<logger name="org.eclipse.equinox.internal.event" level="DEBUG" />
+	<logger name="org.openhab.config.core" level="DEBUG" />
+	<logger name="org.openhab.io.transport.mqtt" level="DEBUG" />
+	<logger name="org.openhab.io.transport.mqtt.internal" level="DEBUG" />
+		<logger name="org.openhab.binding.mqtt.internal" level="DEBUG" />
+			<logger name="org.openhab.model.item.binding" level="DEBUG" />
+
 	<logger name="OSGi" level="ERROR" />
 	<logger name="org.eclipse.jetty" level="ERROR" />
  
 	<root level="ERROR">
 		<appender-ref ref="FILE" />
-		<appender-ref ref="STDOUT" />
+		<!-- <appender-ref ref="STDOUT" /> -->
 	</root>
 
 	<logger name="org.openhab.io.dropbox" level="ERROR" />
