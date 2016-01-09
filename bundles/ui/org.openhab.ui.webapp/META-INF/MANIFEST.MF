@@ -55,7 +55,14 @@ Import-Package: org.apache.commons.io,
  org.openhab.io.transport.mqtt.internal,
  org.openhab.binding.mqtt.internal,
  org.openhab.model.item.binding,
- org.eclipse.paho.client.mqttv3
+ org.eclipse.paho.client.mqttv3,
+ org.openhab.core.autoupdate,
+ com.openhab.core.constant,
+ org.openhab.model.rule.internal.engine,
+ org.openhab.core.scriptengine,
+ org.openhab.model.script.internal.engine,
+ org.openhab.core.autoupdate.internal,
+ org.openhab.core.binding
 Bundle-SymbolicName: org.openhab.ui.webapp
 Bundle-DocURL: http://www.openhab.org
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -69,6 +76,5 @@ Service-Component: OSGI-INF/webappservlet.xml, OSGI-INF/pagerenderer.xml,
  OSGI-INF/colorpickerrenderer.xml
 Bundle-ClassPath: .,
  lib/mqtt-client-0.4.0.jar,lib/guava-18.0.jar
-Export-Package: org.openhab.ui.webapp.render,org.openhab.ui.webapp.internal.render,org.openhab.ui.webapp.internal,org.openhab.ui.webapp.internal.servlet
+Export-Package: org.openhab.ui.webapp.render,org.openhab.ui.webapp.internal.render,org.openhab.ui.webapp.internal,org.openhab.ui.webapp.internal.servlet,com.openhab.core.threadstore
 Require-Bundle: javax.servlet
- 

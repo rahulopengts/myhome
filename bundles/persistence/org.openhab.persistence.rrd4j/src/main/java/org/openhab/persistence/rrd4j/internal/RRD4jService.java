@@ -86,6 +86,7 @@ public class RRD4jService implements QueryablePersistenceService {
 	 */
 	public synchronized void store(final Item item, final String alias) {
 		final String name = alias==null ? item.getName() : alias;
+		//System.out.println("\nRRD4jService->store-store->"+item.getName()+"->alias->"+alias);		
 		ConsolFun function = getConsolidationFunction(item);
 		RrdDb db = getDB(name, function);
 		if(db!=null) {
@@ -97,10 +98,12 @@ public class RRD4jService implements QueryablePersistenceService {
 					if(now - 1 > db.getLastUpdateTime()) {
 						// only do it if there is not already a value
 						double lastValue = db.getLastDatasourceValue(DATASOURCE_STATE);
+						System.out.println("\nRRD4jService->store-update->lastValue"+lastValue);
 						if(!Double.isNaN(lastValue)) {
 							Sample sample = db.createSample();
 				            sample.setTime(now - 1);
 				            sample.setValue(DATASOURCE_STATE, lastValue);
+				            //System.out.println("\nRRD4jService->store-update->lastValue-2"+lastValue);
 				            sample.update();
 		                    logger.debug("Stored '{}' with state '{}' in rrd4j database", name, mapToState(lastValue, item.getName()));
 						}
@@ -118,6 +121,7 @@ public class RRD4jService implements QueryablePersistenceService {
                     double value = state.toBigDecimal().doubleValue();
                     sample.setValue(DATASOURCE_STATE, value);
                     sample.update();
+                    //System.out.println("\nRRD4jService->store-update->value"+value);
                     logger.debug("Stored '{}' with state '{}' in rrd4j database", name, item.getState());
 	            }
 			} catch (IllegalArgumentException e) {
@@ -297,11 +301,12 @@ public class RRD4jService implements QueryablePersistenceService {
 	}
 
 	private State mapToState(double value, String itemName) {
-		//System.out.println("\n RRD4jService->mapToSate->itemName->"+itemName+" itemRegistry->"+itemRegistry);
+
 		if(itemRegistry!=null) {
 			try {
 				Item item = itemRegistry.getItem(itemName);
 				if(item instanceof SwitchItem && !(item instanceof DimmerItem)) {
+					System.out.println("\n RRD4jService->mapToSate->itemName->"+itemName+" value->"+value);	
 					return value==0.0d ? OnOffType.OFF : OnOffType.ON;
 				} else if(item instanceof ContactItem) {
 					return value==0.0d ? OpenClosedType.CLOSED : OpenClosedType.OPEN;
@@ -310,6 +315,7 @@ public class RRD4jService implements QueryablePersistenceService {
 				logger.debug("Could not find item '{}' in registry", itemName);
 			}
 		}
+			
 		// just return a DecimalType as a fallback
 		return new DecimalType(value);
 	}

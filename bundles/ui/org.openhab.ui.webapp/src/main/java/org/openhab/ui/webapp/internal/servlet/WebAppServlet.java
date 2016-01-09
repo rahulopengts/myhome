@@ -33,16 +33,20 @@ import org.openhab.core.items.GenericItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.ItemFactory;
 import org.openhab.core.items.ItemNotFoundException;
+import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.items.StateChangeListener;
 import org.openhab.core.library.CoreItemFactory;
 import org.openhab.core.persistence.PersistenceService;
 import org.openhab.core.persistence.internal.PersistenceManager;
+import org.openhab.core.scriptengine.ScriptEngine;
 import org.openhab.core.types.State;
 import org.openhab.io.transport.mqtt.MqttService;
 import org.openhab.model.core.ModelRepository;
 import org.openhab.model.core.internal.folder.FolderObserver;
 import org.openhab.model.item.binding.BindingConfigReader;
 import org.openhab.model.item.internal.GenericItemProvider;
+import org.openhab.model.rule.internal.engine.RuleEngine;
+import org.openhab.model.script.internal.engine.ScriptEngineImpl;
 import org.openhab.model.sitemap.Frame;
 import org.openhab.model.sitemap.LinkableWidget;
 import org.openhab.model.sitemap.Sitemap;
@@ -79,6 +83,11 @@ import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openhab.core.constant.CloudHomeAutoConstants;
+import com.openhab.core.db.dao.CloudItemDAO;
+import com.openhab.core.db.dao.ICloudDAO;
+import com.openhab.core.event.messaging.mqtt.MessageBrokerService;
+
 /**
  * This is the main servlet for the WebApp UI. 
  * It serves the Html code based on the sitemap model.
@@ -95,7 +104,7 @@ public class WebAppServlet extends BaseServlet {
 	/** timeout for polling requests in milliseconds; if no state changes during this time, 
 	 *  an empty response is returned.
 	 */
-	private static final long TIMEOUT_IN_MS = 10000L;
+	public static final long TIMEOUT_IN_MS = 10000L;
 
 	/** the name of the servlet to be used in the URL */
 	public static final String SERVLET_NAME = "openhab.app";
@@ -107,6 +116,9 @@ public class WebAppServlet extends BaseServlet {
 
 	private EventPublisher	cloudEventPublisher	=	null;
 	private ModelRepository modelRepository	=	null;
+	
+	//CloudChange
+	private MessageBrokerService messageBrokerService	=	null;
 	
 	protected SitemapProvider sitemapProvider;
 	//CloudChange
@@ -180,11 +192,11 @@ public class WebAppServlet extends BaseServlet {
 		boolean async = "true".equalsIgnoreCase((String) req.getParameter("__async"));
 		boolean poll = "true".equalsIgnoreCase((String) req.getParameter("poll"));
 
-		if(FolderObserver.CLOUD_MODE){
-System.out.println("\n WebAppServler - > service -> PageRendered "+renderer);
-renderer	=	handleHttpRequest((HttpServletRequest)req, (HttpServletResponse)res);
-System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRenderer);
-//renderer	=	cloudRenderer;
+		if(CloudHomeAutoConstants.CLOUD_MODE){
+		//System.out.println("\n WebAppServler - > service -> PageRendered "+renderer);
+		renderer	=	handleHttpRequest((HttpServletRequest)req, (HttpServletResponse)res);
+		//System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRenderer);
+		//renderer	=	cloudRenderer;
 		}
 		//System.out.println("\n WebAppServler - > service -> PageRendered "+renderer);
 		// if there are no parameters, display the "default" sitemap
@@ -212,12 +224,22 @@ System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRen
 				EList<Widget> children = sitemap.getChildren();
 				int childSize	=	children.size();
 				
-				if(poll && waitForChanges(children)==false) {
-					// we have reached the timeout, so we do not return any content as nothing has changed
-					res.getWriter().append(getTimeoutResponse()).close();
-					return;
+				if(FolderObserver.CLOUD_MODE){
+					if(poll && CloudWebAppServletHelper.waitForChanges(children,(HttpServletRequest)req)==false) {
+						// we have reached the timeout, so we do not return any content as nothing has changed
+						res.getWriter().append(getTimeoutResponse()).close();
+						return;
+					}
+					
+				} else {
+					if(poll && waitForChanges(children)==false) {
+						// we have reached the timeout, so we do not return any content as nothing has changed
+						res.getWriter().append(getTimeoutResponse()).close();
+						return;
+					}
+					
 				}
-				System.out.println("\n WebAppServler - > service -> request for IF-WidgetId Null");
+				//System.out.println("\n WebAppServler - > service -> request for IF-WidgetId Null");
 				//System.out.println("\n WebAppServler - > sitemap.getChildren()-> "+sitemap.getChildren());
 				StringBuilder testBuilder	=	renderer.processPage("Home", sitemapName, label, sitemap.getChildren(), async);
 				//System.out.println("Chile Size : \n "+ childSize);
@@ -233,28 +255,43 @@ System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRen
 					EList<Widget> children = renderer.getItemUIRegistry().getChildren((LinkableWidget) w);
 					int childSize	=	children.size();
 					//System.out.println("\n Child Size "+childSize);
-					if(poll && waitForChanges(children)==false) {
-						// we have reached the timeout, so we do not return any content as nothing has changed
-						res.getWriter().append(getTimeoutResponse()).close();
-						return;
+					if(FolderObserver.CLOUD_MODE){
+						if(poll && CloudWebAppServletHelper.waitForChanges(children,(HttpServletRequest)req)==false) {
+							// we have reached the timeout, so we do not return any content as nothing has changed
+							res.getWriter().append(getTimeoutResponse()).close();
+							//System.out.println("\n WebAppServlet->waitforChanges->Nothing Changed:");												
+							return;
+						}
+					} else {
+						if(poll && waitForChanges(children)==false) {
+							// we have reached the timeout, so we do not return any content as nothing has changed
+							res.getWriter().append(getTimeoutResponse()).close();
+							//System.out.println("\n WebAppServlet->waitforChanges->Nothing Changed:");												
+							return;
+						}
+						
 					}
+					//System.out.println("\n WebAppServlet->waitforChanges->Changed:");
 					String label = renderer.getItemUIRegistry().getLabel(w);
 					if (label==null) label = "undefined";
 					result.append(renderer.processPage(renderer.getItemUIRegistry().getWidgetId(w), sitemapName, label, children, async));
-					System.out.println("\n WebAppServler - > service -> request for ELSE-WidgetId :"+w.getItem());
+					//System.out.println("\n WebAppServler - > service -> request for ELSE-WidgetId :"+w.getItem());
 				}
 				
 			}
 		} catch(RenderException e) {
 			e.printStackTrace();
 			throw new ServletException(e.getMessage(), e);
+		} catch (CloudException e){
+			e.printStackTrace();
+			throw new ServletException(e.getMessage(), e);			
 		}
 		if(async) {
 			res.setContentType("application/xml;charset=UTF-8");
 		} else {
 			res.setContentType("text/html;charset=UTF-8");
 		}
-		System.out.println("Testing : \n "+ result.toString());
+		//System.out.println("Testing : \n "+ result.toString());
 		res.getWriter().append(result);
 		res.getWriter().close();
 	}
@@ -274,12 +311,15 @@ System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRen
 	 * @param widgets the widgets of the page to observe
 	 */
 	private boolean waitForChanges(EList<Widget> widgets) {
+		//System.out.println("\nWebAppServlet->waitForChanges->Adding Listeners Now");
 		long startTime = (new Date()).getTime();
 		boolean timeout = false;
 		BlockingStateChangeListener listener = new BlockingStateChangeListener();
 		// let's get all items for these widgets
 		Set<GenericItem> items = getAllItems(widgets);
-		for(GenericItem item : items) {			
+		//System.out.println("\nWebAppServlet->waitForChanges->items.size()"+items.size());
+		for(GenericItem item : items) {	
+			//System.out.println("\nWebAppServlet->waitForChanges->"+items.toString()+"->Listener->"+listener.getClass().getName());
 			item.addStateChangeListener(listener);
 		}
 		do {
@@ -367,83 +407,82 @@ System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRen
 	//CloudChange
 	public PageRenderer handleHttpRequest(HttpServletRequest req,HttpServletResponse res){
 		try{
-		Dictionary dict = new Hashtable();
-		//String[] s	=	{"10","items"};
-		String s	=	"10,items";
-		dict.put("items",s);
-		
-		String s1	=	"10,persist";
-		dict.put("persistence",s1);
-		
-		String s2	=	"10,rules";
-		dict.put("rules",s2);
-		
-		String s3	=	"10,script";
-		dict.put("scripts",s3);
-		
-		String s4	=	",service.pid";
-		dict.put("service.pid",s4);
-		
-		String s5	=	"10,sitemap";
-		dict.put("sitemaps",s5);
-		
-		ModelRepository	localModelRepository	=	null;
-		CloudFolderObserver	cloudFolderObserver	=	null;
-		HttpSession	session	=	CloudSessionManager.getSession(req, res);
-		cloudRenderer	=	(PageRenderer)CloudSessionManager.getAttribute(session,CloudSessionManager.PAGERRENDERER);
-		if(cloudRenderer==null){
-			cloudRenderer	=	new PageRenderer();
-			cloudFolderObserver	=	new CloudFolderObserver();
-			cloudFolderObserver.updated(dict);
-			localModelRepository	=	cloudFolderObserver.getModelRepository();
-			CloudSessionManager.setAttribute(session, CloudSessionManager.PAGERRENDERER, cloudRenderer);
-			CloudSessionManager.setAttribute(session, CloudSessionManager.MODELREPO, localModelRepository);
+			Dictionary dict = new Hashtable();
+			//String[] s	=	{"10","items"};
+			String s	=	"10,items";
+			dict.put("items",s);
 			
-			CloudSessionManager.setAttribute(session, CloudSessionManager.EVENTPUBLISHER, cloudEventPublisher);
+			String s1	=	"10,persist";
+			dict.put("persistence",s1);
 			
-			System.out.println("\nWebAppServlet->FirstRequest->cloudEventPublisher->"+cloudEventPublisher);
+			String s2	=	"10,rules";
+			dict.put("rules",s2);
 			
-			System.out.println("\n WebAppServler->handleHttprequest->Created Session and PageRenderer");
-		} else {
-			System.out.println("\n WebAppServler->handleHttprequest->Existing Session and PageRenderer");
-			return cloudRenderer;
-		}
+			String s3	=	"10,script";
+			dict.put("scripts",s3);
 			
-		
-		ItemUIRegistryImpl	cloudUIItemRegistry	=	 new ItemUIRegistryImpl();
-		cloudRenderer.setItemUIRegistry(cloudUIItemRegistry);
-		ItemRegistryImpl	itemRegistry	=	new ItemRegistryImpl();
-		//ItemUIRegistryImpl	depends on ItemRegistryImpl and ItemUIProvider		
-		ItemUIProvider cloudItemUIProvider	=	new GenericItemUIProvider();
-		cloudUIItemRegistry.setItemRegistry(itemRegistry);
-		cloudUIItemRegistry.addItemUIProvider(cloudItemUIProvider);
-		//ItemRegistry Depends on ItemProvider-GenericItemProvider
-		GenericItemProvider	cloudGenericItemProvider	=	new GenericItemProvider();
-		//Depends on ModelRepositoryImpl, ItemFactory,BindingConfigReader		
-		//--MOVED-ModelRepository	localModelRepository1	=	cloudFolderObserver.getModelRepository();
-		localModelRepository.setName("rahul");
-		System.out.println("\nWebAppServlet->ModelRepositoryImpl->this->"+localModelRepository);
-		
-		cloudGenericItemProvider.setModelRepository(localModelRepository);
-		
-		
-		
-		//cloudGenericItemProvider.addItemFactory(factory)
-		ItemFactory	itemFactory	=	new CoreItemFactory();
-		cloudGenericItemProvider.addItemFactory(itemFactory);
-		itemRegistry.addItemProvider(cloudGenericItemProvider);
-
-		intitializeMQTTBinding(cloudGenericItemProvider,localModelRepository);
-		
-		cloudSitemapProvider	=	new SitemapProviderImpl();
-		
-		cloudSitemapProvider.setModelRepository(localModelRepository);
-		sitemapProvider	=	cloudSitemapProvider;
-		CloudSessionManager.setAttribute(session, CloudSessionManager.ITEMREGISTRY, itemRegistry);
-		addPageRenderers(cloudRenderer,cloudUIItemRegistry,localModelRepository);
-
-		
-		
+			String s4	=	",service.pid";
+			dict.put("service.pid",s4);
+			
+			String s5	=	"10,sitemap";
+			dict.put("sitemaps",s5);
+			
+			ModelRepository	localModelRepository	=	null;
+			CloudFolderObserver	cloudFolderObserver	=	null;
+			HttpSession	session	=	CloudSessionManager.getSession(req, res);
+			cloudRenderer	=	(PageRenderer)CloudSessionManager.getAttribute(session,CloudSessionManager.PAGERRENDERER);
+			if(cloudRenderer==null){
+				cloudRenderer	=	new PageRenderer();
+				cloudFolderObserver	=	new CloudFolderObserver();
+				cloudFolderObserver.updated(dict);
+				localModelRepository	=	cloudFolderObserver.getModelRepository();
+				CloudSessionManager.setAttribute(session, CloudSessionManager.PAGERRENDERER, cloudRenderer);
+				CloudSessionManager.setAttribute(session, CloudSessionManager.MODELREPO, localModelRepository);
+				CloudSessionManager.setAttribute(session, CloudSessionManager.EVENTPUBLISHER, cloudEventPublisher);
+			} else {
+				return cloudRenderer;
+			}
+				
+			ItemUIRegistryImpl	cloudUIItemRegistry	=	 new ItemUIRegistryImpl();
+			cloudRenderer.setItemUIRegistry(cloudUIItemRegistry);
+			ItemRegistryImpl	cloudItemRegistry	=	new ItemRegistryImpl();
+			//ItemUIRegistryImpl	depends on ItemRegistryImpl and ItemUIProvider		
+			ItemUIProvider cloudItemUIProvider	=	new GenericItemUIProvider();
+			cloudUIItemRegistry.setItemRegistry(cloudItemRegistry);
+			((GenericItemUIProvider)cloudItemUIProvider).setModelRepository(localModelRepository);
+			cloudUIItemRegistry.addItemUIProvider(cloudItemUIProvider);
+			//ItemRegistry Depends on ItemProvider-GenericItemProvider
+			GenericItemProvider	cloudGenericItemProvider	=	new GenericItemProvider();
+			//Depends on ModelRepositoryImpl, ItemFactory,BindingConfigReader		
+			//--MOVED-ModelRepository	localModelRepository1	=	cloudFolderObserver.getModelRepository();
+			localModelRepository.setName("rahul");
+			System.out.println("\nWebAppServlet->ModelRepositoryImpl->this->"+localModelRepository);
+			
+			cloudGenericItemProvider.setModelRepository(localModelRepository);
+			
+			
+			
+			//cloudGenericItemProvider.addItemFactory(factory)
+			ItemFactory	itemFactory	=	new CoreItemFactory();
+			cloudGenericItemProvider.addItemFactory(itemFactory);
+			cloudItemRegistry.addItemProvider(cloudGenericItemProvider);
+	
+			intitializeMQTTBinding(cloudGenericItemProvider,localModelRepository);
+			
+			cloudSitemapProvider	=	new SitemapProviderImpl();
+			
+			cloudSitemapProvider.setModelRepository(localModelRepository);
+			sitemapProvider	=	cloudSitemapProvider;
+			CloudSessionManager.setAttribute(session, CloudSessionManager.ITEMREGISTRY, cloudItemRegistry);
+			addPageRenderers(cloudRenderer,cloudUIItemRegistry,localModelRepository);
+	
+			
+			PersistenceManager	persistenceManager	=	initilizeModelWithStoredData(cloudItemRegistry,localModelRepository);
+			CloudSessionManager.setAttribute(session, CloudSessionManager.PERSISTENCEMANAGER, persistenceManager);
+			RuleEngine ruleEngine	=	initializeRuleEngine(cloudItemRegistry,localModelRepository);
+			
+			CloudSessionManager.setAttribute(session, CloudSessionManager.RULEENGINE, ruleEngine);
+			
 		} catch (Throwable e){
 			e.printStackTrace();
 			//throw e;
@@ -452,8 +491,23 @@ System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRen
 		return cloudRenderer;
 	}
 
-	
+	private RuleEngine initializeRuleEngine(ItemRegistry cloudItemRegistry,ModelRepository localModelRepository){
+		RuleEngine ruleEngine	=	new RuleEngine();
+		System.out.println("\n CloudEventPublisheImpl->Initialize RuleEngine->2");
+		ruleEngine.setItemRegistry(cloudItemRegistry);
+		System.out.println("\n CloudEventPublisheImpl->Initialize RuleEngine->3");
+		ScriptEngine	scriptEngine	=	new ScriptEngineImpl();
+		((ScriptEngineImpl)scriptEngine).activate();
+		System.out.println("\n CloudEventPublisheImpl->Initialize RuleEngine->4");
+		ruleEngine.setScriptEngine(scriptEngine);
+		System.out.println("\n CloudEventPublisheImpl->Initialize RuleEngine->5");
+		ruleEngine.setModelRepository(localModelRepository);
+		System.out.println("\n CloudEventPublisheImpl->Initialize RuleEngine->6");
+		ruleEngine.activate();
+		return ruleEngine;
+	}
 	private void addPageRenderers(PageRenderer cloudRenderer,ItemUIRegistry cloudUIItemRegistry,ModelRepository localModelRepository){
+		 
 
 		 WidgetRenderer	groupRenderer	=	new	GroupRenderer();
 		 groupRenderer.setItemUIRegistry(cloudUIItemRegistry);
@@ -508,17 +562,28 @@ System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRen
 		 cloudRenderer.addWidgetRenderer(webviewRenderer);
 		 cloudRenderer.addWidgetRenderer(setpointRenderer);
 		 cloudRenderer.addWidgetRenderer(colorpickerRenderer);
-		 
-		 
-		 PersistenceService	persistenceService	=	new RRD4jService();
-		 RRD4jService	rRD4jService	=	(RRD4jService)persistenceService;
-		 rRD4jService.setItemRegistry(cloudUIItemRegistry);
-		 PersistenceManager persistenceManager	=	new PersistenceManager();
-		 persistenceManager.setItemRegistry(cloudUIItemRegistry);
-		 persistenceManager.setModelRepository(localModelRepository);
-		 persistenceManager.addPersistenceService(persistenceService);
+//		 initilizeModelWithStoredData(cloudUIItemRegistry,localModelRepository);
+
 	}
 	
+	private PersistenceManager initilizeModelWithStoredData(ItemRegistry cloudItemRegistry,ModelRepository localModelRepository){
+		 //This to initialize the stored data into the modelreposotory.
+		
+		 PersistenceService	persistenceService	=	new RRD4jService();
+		 RRD4jService	rRD4jService	=	(RRD4jService)persistenceService;
+		 rRD4jService.setItemRegistry(cloudItemRegistry);
+		 PersistenceManager persistenceManager	=	new PersistenceManager();
+		 persistenceManager.setItemRegistry(cloudItemRegistry);
+		 persistenceManager.setModelRepository(localModelRepository);
+		 persistenceManager.addPersistenceService(persistenceService);
+		 
+		 return persistenceManager;
+		 
+		 //---------------------NEW DB-----------------------//
+/*		 ICloudDAO	cloudDAO	=	new CloudItemDAO();
+		 cloudDAO.initialzeItem(localModelRepository, cloudUIItemRegistry);
+*/		 
+	}
 	
 	public void validateAndGetSession(HttpServletRequest req,HttpServletResponse resp){
 		if(req!=null){
@@ -542,7 +607,11 @@ System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRen
 			//cloudEventPublisher	=	mqttService.getEventPublisher();
 			cloudEventPublisher	=	new EventPublisherImpl();
 			mqttService.setEventPublisher(cloudEventPublisher);
-			System.out.println("\nWebAppServlet->initilize->cloudEventPublisher->"+cloudEventPublisher);
+			messageBrokerService	=	MessageBrokerService.getInstance();
+//			AdminEventImpl	manager	=	new AdminEventImpl();
+//			manager.initializeBus();
+			
+			//System.out.println("\nWebAppServlet->initilize->cloudEventPublisher->"+cloudEventPublisher);
 		} catch (Exception e){
 			e.printStackTrace();
 			CloudExceptionManager.throwException(CloudMessageConstants.MQTT_SERVICE_ERROR, null, "could not initilize mqtt");
@@ -567,7 +636,7 @@ System.out.println("\n WebAppServler - > service -> CloudPageRendered "+cloudRen
 	
 	public void intitializeMQTTBinding(GenericItemProvider genericItemProvider,ModelRepository modelRepo){
 		BindingConfigReader	bindingConfigReader	=	new MqttGenericBindingProvider();
-		System.out.println("\nWebAppServlet->initialzeMqttBinding->"+bindingConfigReader);
+		//System.out.println("\nWebAppServlet->initialzeMqttBinding->"+bindingConfigReader);
 		((MqttGenericBindingProvider)bindingConfigReader).setMqttService(mqttService);
 		genericItemProvider.addBindingConfigReader(bindingConfigReader);
 	}

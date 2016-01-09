@@ -33,6 +33,8 @@ abstract public class AbstractEventSubscriber implements EventSubscriber, EventH
 		}
 		String operation = topicParts[1];
 		
+		System.out.println("\nAbstractEventSubscriber->handleEvent->==:Thread "+Thread.currentThread().getId()+":ThreadName:"+Thread.currentThread().getName()+":->topicParts->"+topicParts[1]);
+		
 		if(operation.equals(EventType.UPDATE.toString())) {
 			State newState = (State) event.getProperty("state");
 			System.out.println("\nAbstractEventSubscriber->handleEvent->operation==UPDATE :"+this);
@@ -41,6 +43,7 @@ abstract public class AbstractEventSubscriber implements EventSubscriber, EventH
 		if(operation.equals(EventType.COMMAND.toString())) {
 			Command command = (Command) event.getProperty("command");
 			System.out.println("\nAbstractEventSubscriber->handleEvent->operation==COMMAND :"+this);
+			System.out.println("\nAbstractEventSubscriber->handleEvent->operation==COMMAND Item :"+itemName+"->Command->"+command);
 			if(command!=null) receiveCommand(itemName, command);
 		}
 	}

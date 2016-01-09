@@ -12,7 +12,9 @@ import static org.openhab.core.events.EventConstants.TOPIC_PREFIX;
 import static org.openhab.core.events.EventConstants.TOPIC_SEPERATOR;
 
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.types.Command;
@@ -55,10 +57,15 @@ public class EventPublisherImpl implements EventPublisher {
 	 * @see org.openhab.core.internal.events.EventPublisher#sendCommand(org.openhab.core.items.GenericItem, org.openhab.core.datatypes.DataType)
 	 */
 	public void sendCommand(String itemName, Command command) {
+		System.out.println("\n EventPublisheImpl->sendCommand->"+eventAdmin.getClass().getName());
 		if (command != null) {
+			System.out.println("\n EventPublisheImpl->sendCommand->Command is not null");
 			if(eventAdmin!=null){
 				System.out.println("\n EventPublisheImpl : EventAdmin : "+eventAdmin.getClass().getName());
 				eventAdmin.sendEvent(createCommandEvent(itemName, command));
+				
+			} else {
+				System.out.println("\n EventPublisheImpl->sendCommand->eventAdmin is Null");
 			}
 		} else {
 			logger.warn("given command is NULL, couldn't send command to '{}'", itemName);

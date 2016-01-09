@@ -54,6 +54,7 @@ public abstract class AbstractBinding<P extends BindingProvider> extends Abstrac
 	 * @param provider the new {@link BindingProvider} to add
 	 */
 	public void addBindingProvider(P provider) {
+		System.out.println("\nAbstractBinding->addbindingProvider->"+provider.getClass());
 		this.providers.add(provider);
         provider.addBindingChangeListener(this);
         allBindingsChanged(provider);
@@ -93,6 +94,7 @@ public abstract class AbstractBinding<P extends BindingProvider> extends Abstrac
 		if (!providesBindingFor(itemName)) {
 			return;
 		}
+		System.out.println("\nAbstractBinding->receiveCommand->itemName"+itemName+"->Command->"+command);
 		internalReceiveCommand(itemName, command);
 	}
 	

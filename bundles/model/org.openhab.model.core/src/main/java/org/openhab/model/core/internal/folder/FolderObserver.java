@@ -29,6 +29,8 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openhab.core.constant.CloudHomeAutoConstants;
+
 /**
  * This class is able to observe multiple folders for changes. It checks the
  * last modified date in a configurable frequency and notifies the model repository
@@ -82,7 +84,9 @@ public class FolderObserver extends Thread implements ManagedService {
 		this.modelRepo = null;
 	}
 
-	public static final boolean CLOUD_MODE	=	true;
+	public static final boolean CLOUD_MODE	=	CloudHomeAutoConstants.CLOUD_MODE;
+	
+	//public static final boolean CLOUD_MODE	=	false;
 	//Also change MqttService.update method for cloud
 	@Override
 	public void run() {

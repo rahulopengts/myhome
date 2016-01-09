@@ -41,6 +41,7 @@ public class ScriptExecutionThread extends Thread {
 	public void run() {
 		super.run();
 		try {
+			System.out.println("\n-ScriptExecutionThread->context->"+context);
 			result = script.execute(context);
 		} catch (ScriptExecutionException e) {
 			String msg = e.getCause().getMessage();

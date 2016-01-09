@@ -175,3 +175,11 @@ then
 	var Number humidex = T + (new Double(5) / new Double(9)) * (e - 10)
 	postUpdate(Weather_Humidex, humidex)
 end
+
+
+rule "testLights"
+    when   
+            Item Node03 changed from OFF to ON or
+    then   
+			sendCommand(Node01, OFF)
+    end

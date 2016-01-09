@@ -52,7 +52,7 @@ Export-Package: org.openhab.model.script,org.openhab.model.script.acti
  cript.scoping,org.openhab.model.script.script,org.openhab.model.scrip
  t.script.impl,org.openhab.model.script.script.util,org.openhab.model.
  script.services,org.openhab.model.script.validation,org.openhab.model
- .script.serializer
+ .script.serializer,org.openhab.model.script.internal.engine
 Service-Component: OSGI-INF/scriptengine.xml
 Bundle-Activator: org.openhab.model.script.internal.ScriptActivator
 Bundle-ClassPath: .

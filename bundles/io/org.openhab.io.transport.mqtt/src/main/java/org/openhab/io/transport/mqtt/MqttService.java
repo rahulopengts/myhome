@@ -22,6 +22,8 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openhab.core.constant.CloudHomeAutoConstants;
+
 /**
  * MQTT Service for creating new connections to MQTT brokers from the openHAB
  * configuration file and registering message publishers and subscribers. This
@@ -43,7 +45,7 @@ public class MqttService implements ManagedService {
 	public void updated(Dictionary<String, ?> properties)
 			throws ConfigurationException {
 
-		boolean cloud=true;
+		boolean cloud	=	CloudHomeAutoConstants.CLOUD_MODE;
 		if(!cloud){
 		// load broker configurations from configuration file
 		if (properties == null || properties.isEmpty()) {
@@ -72,9 +74,9 @@ public class MqttService implements ManagedService {
 			String name = subkeys[0].toLowerCase();
 			String property = subkeys[1];
 
-			System.out.println("\nMqttService->updated->key->"+key);
-			System.out.println("\nMqttService->updated->value->"+value);
-			System.out.println("\nMqttService->updated->property->"+subkeys[1]);
+//			System.out.println("\nMqttService->updated->key->"+key);
+//			System.out.println("\nMqttService->updated->value->"+value);
+//			System.out.println("\nMqttService->updated->property->"+subkeys[1]);
 			if (StringUtils.isBlank(value)) {
 				logger.trace("Property is empty: {}", key);
 				continue;

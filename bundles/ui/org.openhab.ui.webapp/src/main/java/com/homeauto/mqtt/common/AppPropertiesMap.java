@@ -27,7 +27,7 @@ public class AppPropertiesMap {
 	
 	public static String MQTT_SERVER_HOST_IP	=	"localhost";
 	public static String MQTT_SERVER_PORT		=	"1883";
-	public static String MQTT_SUBS_TOPIC		=	"/raspberry";
+	public static String MQTT_SUBS_TOPIC1		=	"/raspberry";
 	public static String MQTT_CLIENT_ID			=	"JavaSample";
 	
 	

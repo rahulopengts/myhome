@@ -75,6 +75,8 @@ public class BusEvent {
 	 * @param commandString the command to send
 	 */
 	static public Object sendCommand(String itemName, String commandString) {
+		
+
 		ItemRegistry registry = (ItemRegistry) ScriptActivator.itemRegistryTracker.getService();
 		EventPublisher publisher = (EventPublisher) ScriptActivator.eventPublisherTracker.getService();
 		if(publisher!=null && registry!=null) {
@@ -98,6 +100,7 @@ public class BusEvent {
 	static public Object sendCommand(Item item, Command command) {
 		EventPublisher publisher = (EventPublisher) ScriptActivator.eventPublisherTracker.getService();
 		if (publisher!=null && item != null) {
+			System.out.println("\nBusEvent->sendCommand->item->"+item.getName());
 			publisher.sendCommand(item.getName(), command);
 		}
 		return null;

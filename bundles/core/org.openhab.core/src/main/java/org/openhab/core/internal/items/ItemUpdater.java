@@ -50,7 +50,9 @@ public class ItemUpdater extends AbstractEventSubscriber {
 			try {
 				GenericItem item = (GenericItem) itemRegistry.getItem(itemName);
 				boolean isAccepted = false;
+				System.out.println("\nItemUpdater->receiveUpdate->item->"+item);
 				if (item.getAcceptedDataTypes().contains(newStatus.getClass())) {
+					System.out.println("\nItemUpdater->receiveUpdate->isAccepted->1->"+isAccepted);
 					isAccepted = true;
 				} else {
 					// Look for class hierarchy
@@ -58,6 +60,7 @@ public class ItemUpdater extends AbstractEventSubscriber {
 						try {
 							if (!state.isEnum() && state.newInstance().getClass().isAssignableFrom(newStatus.getClass())) {
 								isAccepted = true;
+								System.out.println("\nItemUpdater->receiveUpdate->isAccepted->2->"+isAccepted);
 								break;
 							}
 						} catch (InstantiationException e) {
@@ -68,6 +71,7 @@ public class ItemUpdater extends AbstractEventSubscriber {
 					}
 				}				
 				if (isAccepted) {
+					System.out.println("\nItemUpdater->receiveUpdate->isAccepted->itemName->"+itemName+"->newStatus->"+newStatus);
 					item.setState(newStatus);
 				} else {
 					logger.debug("Received update of a not accepted type ("	+ newStatus.getClass().getSimpleName() + ") for item " + itemName);
@@ -86,6 +90,7 @@ public class ItemUpdater extends AbstractEventSubscriber {
 		// if the item is a group, we have to pass the command to it as it needs to pass the command to its members
 		if(itemRegistry!=null) {
 			try {
+				System.out.println("\nItemUpdater->receiveCommand->item->"+itemName+"->command->"+command);
 				Item item = itemRegistry.getItem(itemName);
 				if (item instanceof GroupItem) {
 					GroupItem groupItem = (GroupItem) item;

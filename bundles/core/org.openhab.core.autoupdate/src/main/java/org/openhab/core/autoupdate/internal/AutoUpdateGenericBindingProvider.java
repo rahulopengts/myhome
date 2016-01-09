@@ -78,6 +78,7 @@ public class AutoUpdateGenericBindingProvider extends AbstractGenericBindingProv
 	@Override
 	public Boolean autoUpdate(String itemName) {
 		AutoUpdateBindingConfig config = (AutoUpdateBindingConfig) bindingConfigs.get(itemName);
+		System.out.println("\nAutoUpdateGenericBindingProvider->autoUpdate->itemName->"+itemName+"->Config->"+config);		
 		return config != null ? config.autoupdate : null;
 	}
 	

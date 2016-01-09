@@ -103,12 +103,20 @@ abstract public class GenericItem implements Item {
 	private void notifyListeners(State oldState, State newState) {
 		// if nothing has changed, we send update notifications
 		Set<StateChangeListener> clonedListeners = null;
+		
 		clonedListeners = new CopyOnWriteArraySet<StateChangeListener>(listeners);
 		for(StateChangeListener listener : clonedListeners) {
+			System.out.println("\nGenericItem->notifyListeners->update-listener->"+listener.getClass() +":itemname:"+this.getName()+":newState:"+newState+"->oldState->"+oldState);
+//			PersistenceManager
+//			RuleEngine
+//			WebAppServlet$BlockingStateChangeListener
+//			HttpBinding
+//			MqttItemBinding
 			listener.stateUpdated(this, newState);
 		}
 		if(!oldState.equals(newState)) {
 			for(StateChangeListener listener : clonedListeners) {
+				System.out.println("\nGenericItem->notifyListeners->changed-listener->"+listener.getClass() +":itemname:"+this.getName()+":newState:"+newState);
 				listener.stateChanged(this, oldState, newState);
 			}
 		}
@@ -126,6 +134,7 @@ abstract public class GenericItem implements Item {
 
 	public void addStateChangeListener(StateChangeListener listener) {
 		synchronized(listeners) {
+			System.out.println("\nGenericItem->addStateChangeListener->listener->"+listener);
 			listeners.add(listener);
 		}
 	}

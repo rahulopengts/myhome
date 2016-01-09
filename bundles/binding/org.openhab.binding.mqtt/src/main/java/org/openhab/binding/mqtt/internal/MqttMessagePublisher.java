@@ -42,7 +42,7 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 	 */
 	public MqttMessagePublisher(String configuration) throws BindingConfigParseException {
 
-		System.out.println("\n MqttMessagePublisher : "+configuration+":instance:"+this);
+		//System.out.println("\n MqttMessagePublisher : "+configuration+":instance:"+this);
 //		String s	=	null;
 //		s.toString();
 		String[] config = splitConfigurationString(configuration);
@@ -72,7 +72,7 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 				try {
 					MessageType t = MessageType.valueOf(config[2].trim().toUpperCase());
 					
-					System.out.println("\n MqttMessagePublisher : MessageType"+t.toString());
+					//System.out.println("\n MqttMessagePublisher : MessageType"+t.toString());
 					setMessageType(t);
 				} catch (IllegalArgumentException e) {
 					throw new BindingConfigParseException("Invalid type.");
@@ -83,13 +83,13 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 				throw new BindingConfigParseException("Missing trigger.");
 			} else {
 				trigger = config[3].trim();
-				System.out.println("\n MqttMessagePublisher : trigger"+trigger);
+				//System.out.println("\n MqttMessagePublisher : trigger"+trigger);
 			}
 
 			if (StringUtils.isEmpty(config[4])) {
 				throw new BindingConfigParseException("Missing transformation configuration.");
 			} else {
-				System.out.println("\n MqttMessagePublisher : setTransformationRule"+config[4].trim());
+				//System.out.println("\n MqttMessagePublisher : setTransformationRule"+config[4].trim());
 				setTransformationRule(config[4].trim());
 				initTransformService();
 			}
@@ -150,7 +150,7 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 	 */
 	private byte[] createMessage(String value) throws Exception {
 
-		System.out.println("\n MqttMessagePublisher : createMessage "+new String(value) );
+		//System.out.println("\n MqttMessagePublisher : createMessage "+new String(value) );
 		if (getTransformationServiceName() != null
 				&& getTransformationService() == null) {
 			logger.debug("Sending message before transformation service '{}' was initialized.");
@@ -160,25 +160,25 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 		String content = value;
 
 		if (getTransformationService() != null) {
-			System.out.println("\n MqttMessagePublisher : createMessage -1") ;
+			//System.out.println("\n MqttMessagePublisher : createMessage -1") ;
 			content = getTransformationService().transform(getTransformationServiceParam(), value);
-			System.out.println("\n MqttMessagePublisher : createMessage content "+content) ;
+			//System.out.println("\n MqttMessagePublisher : createMessage content "+content) ;
 		} else if (getTransformationRule() != null && !getTransformationRule().equalsIgnoreCase("default")) {
 			
 			content = getTransformationRule();
-			System.out.println("\n MqttMessagePublisher : createMessage -2 content "+content) ;
+			//System.out.println("\n MqttMessagePublisher : createMessage -2 content "+content) ;
 		}
 
 		if (getMessageType().equals(MessageType.STATE)) {
 			
 			content = StringUtils.replace(content, "${state}", value);
-			System.out.println("\n MqttMessagePublisher : createMessage -3 state"+content) ;
+			//System.out.println("\n MqttMessagePublisher : createMessage -3 state"+content) ;
 		} else {
 			content = StringUtils.replace(content, "${command}", value);
-			System.out.println("\n MqttMessagePublisher : createMessage -4 state"+content) ;
+			//System.out.println("\n MqttMessagePublisher : createMessage -4 state"+content) ;
 		}
 		content = StringUtils.replace(content, "${itemName}", getItemName());
-		System.out.println("\n MqttMessagePublisher : createMessage -Final "+content) ;
+		//System.out.println("\n MqttMessagePublisher : createMessage -Final "+content) ;
 		return content.getBytes();
 	}
 
@@ -196,7 +196,7 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 			
 		try {
 			String m	=new String(createMessage(new String(message)));
-			System.out.println("\n MqttMessagePublisher : publish message : "+topic+" message byte is"+new String(message) +" : Message is ::"+m+":this:"+this);
+			//System.out.println("\n MqttMessagePublisher : publish message : "+topic+" message byte is"+new String(message) +" : Message is ::"+m+":this:"+this);
 //			if(!m.equals("OFF")){
 //				String s	=	null;
 //				s.toString();

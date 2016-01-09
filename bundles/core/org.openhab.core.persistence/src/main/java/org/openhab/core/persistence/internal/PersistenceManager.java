@@ -240,6 +240,7 @@ public class PersistenceManager extends AbstractEventSubscriber implements Model
 					for(PersistenceConfiguration config : entry.getValue()) {
 						if(hasStrategy(serviceName, config, onlyChanges ? GlobalStrategies.CHANGE : GlobalStrategies.UPDATE)) {
 							if(appliesToItem(config, item)) {
+								System.out.println("\nPersistenceManager->handleStateEvent-item->"+item.getName()+"->config->"+config+"->config.getAlias->"+config.getAlias());
 								persistenceServices.get(serviceName).store(item, config.getAlias());
 							}
 						}
@@ -390,7 +391,7 @@ public class PersistenceManager extends AbstractEventSubscriber implements Model
 									GenericItem genericItem = (GenericItem) item;
 									genericItem.removeStateChangeListener(this);
 									genericItem.setState(historicItem.getState());
-									//System.out.println("\n PersistenceManager->initialize->serviceName->"+item.getName()+"->:State:->>"+historicItem.getState());
+									System.out.println("\n PersistenceManager->initialize->serviceName->"+item.getName()+"->:State:->>"+historicItem.getState());
 									genericItem.addStateChangeListener(this);
 									logger.debug("Restored item state from '{}' for item '{}' -> '{}'", 
 											new Object[] { DateFormat.getDateTimeInstance().format(historicItem.getTimestamp()), 

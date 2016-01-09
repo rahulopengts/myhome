@@ -18,6 +18,7 @@ import static org.openhab.model.rule.internal.engine.RuleTriggerManager.TriggerT
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EObject;
@@ -45,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.openhab.core.constant.CloudHomeAutoConstants;
 
 
 /**
@@ -68,6 +70,7 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 		private RuleTriggerManager triggerManager;
 						
 		public void activate() {
+			try{
 			triggerManager = new RuleTriggerManager();
 
 			if(!isEnabled()) {
@@ -93,6 +96,9 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 				internalItemAdded(item);
 			}
 			runStartupRules();
+			} catch (Throwable	e){
+				e.printStackTrace();
+			}
 		}
 		
 		public void deactivate() {
@@ -163,12 +169,25 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 		/**
 		 * {@inheritDoc}
 		 */
-		public void stateChanged(Item item, State oldState, State newState) {			
+		public void stateChanged(Item item, State oldState, State newState) {
+			System.out.println("\nRuleEngine->stateChanged->"+item+"->oldState->"+oldState+"->newState->"+newState);
 			if(triggerManager!=null) {
 				Iterable<Rule> rules = triggerManager.getRules(CHANGE, item, oldState, newState);
 				RuleEvaluationContext context = new RuleEvaluationContext();
 				context.newValue(QualifiedName.create(RuleContextHelper.VAR_PREVIOUS_STATE), oldState);
-				executeRules(rules, context);
+				
+				System.out.println("\nRuleEngine->stateChanged->Rule->"+rules+"->"+rules.toString()+"->QualifiedName->"+QualifiedName.create(RuleContextHelper.VAR_PREVIOUS_STATE));
+				Iterator<Rule>	ruleIterator	=	rules.iterator();
+				if(CloudHomeAutoConstants.CLOUD_MODE){
+					while(ruleIterator.hasNext()){
+						Rule rule	=	ruleIterator.next();
+						System.out.println("\nRuleEngine->stateChanged->Rule->Identified Rules->"+rule);	
+					}
+					
+				} else {
+					executeRules(rules, context);
+				}
+				
 			}
 		}
 
@@ -183,13 +202,16 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 		}
 
 		public void receiveCommand(String itemName, Command command) {
+			System.out.println("\nRuleEngine->receiveCommand->1->itemName"+itemName+"->oldState->"+itemName+"->newState->"+command);
 			if(triggerManager!=null && itemRegistry!=null) {
 				try {
+					System.out.println("\nRuleEngine->receiveCommand->2->itemName"+itemName+"->newState->"+command);
 					Item item = itemRegistry.getItem(itemName);
 					Iterable<Rule> rules = triggerManager.getRules(COMMAND, item, command);
 					RuleEvaluationContext context = new RuleEvaluationContext();
 					context.newValue(QualifiedName.create(RuleContextHelper.VAR_RECEIVED_COMMAND), command);
 					executeRules(rules, context);
+					System.out.println("\nRuleEngine->receiveCommand->3->itemName"+itemName+"->newState->"+command);
 				} catch (ItemNotFoundException e) {
 					// ignore commands for non-existent items
 				}
@@ -208,7 +230,7 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 		 */
 		public void handleEvent(Event event) {  
 			String itemName = (String) event.getProperty("item");
-			
+			System.out.println("\nRuleEngine->handleEvent->");
 			String topic = event.getTopic();
 			String[] topicParts = topic.split(TOPIC_SEPERATOR);
 			
@@ -293,6 +315,7 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 		}
 			
 		protected synchronized void executeRule(Rule rule, RuleEvaluationContext context) {
+			
 			Script script = scriptEngine.newScriptFromXExpression(rule.getScript());
 			
 			logger.debug("Executing rule '{}'", rule.getName());
@@ -309,6 +332,7 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 		
 		protected synchronized void executeRules(Iterable<Rule> rules, RuleEvaluationContext context) {
 			for(Rule rule : rules) {
+				System.out.println("\nRuleEngine->executeRules->"+rule.getName()+"->Content->"+rule.toString());
 				executeRule(rule, context);
 			}
 		}

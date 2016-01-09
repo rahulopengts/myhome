@@ -121,16 +121,16 @@ public class MqttBrokerConnection implements MqttCallback {
 
 		// start all consumers
 		for (MqttMessageConsumer c : consumers) {
-			System.out.println("\nMqttBrokerConnection->openConnection->MqttMessageConsumer :"+c.getTopic()+"::"+c);
+			//System.out.println("\nMqttBrokerConnection->openConnection->MqttMessageConsumer :"+c.getTopic()+"::"+c);
 			startConsumer(c);
 		}
 
 		// start all producers
 		for (MqttMessageProducer p : producers) {
-			System.out.println("\nMqttBrokerConnection->openConnection->MqttMessageProducer :"+p.toString()+"::"+p);
+			//System.out.println("\nMqttBrokerConnection->openConnection->MqttMessageProducer :"+p.toString()+"::"+p);
 			startProducer(p);
 		}
-System.out.println("\nMqttBrokerConnection->openConnection->Done with Pub and Sub");
+//System.out.println("\nMqttBrokerConnection->openConnection->Done with Pub and Sub");
 		started = true;
 	}
 
@@ -421,13 +421,13 @@ System.out.println("\nMqttBrokerConnection->openConnection->Done with Pub and Su
 			public void publish(String topic, byte[] payload) throws Exception {
 
 				if (!started) {
-					System.out.println("\nMqttBrokerConnection->Publich Not Started");
+					//System.out.println("\nMqttBrokerConnection->Publich Not Started");
 					logger.warn(
 							"Broker connection not started. Cannot publish message to topic '{}'",
 							topic);
 					return;
 				}
-				System.out.println("\nMqttBrokerConnection->Publich Started "+topic+" Message "+new String (payload));
+				//System.out.println("\nMqttBrokerConnection->Publich Started "+topic+" Message "+new String (payload));
 				// Create and configure a message
 				MqttMessage message = new MqttMessage(payload);
 				message.setQos(qos);
@@ -463,7 +463,7 @@ System.out.println("\nMqttBrokerConnection->openConnection->Done with Pub and Su
 	public synchronized void addConsumer(MqttMessageConsumer subscriber) {
 		consumers.add(subscriber);
 		if (started) {
-			System.out.println("\nMqttBrokerConnection->addConsumer->"+subscriber.getTopic());
+			//System.out.println("\nMqttBrokerConnection->addConsumer->"+subscriber.getTopic());
 			startConsumer(subscriber);
 		}
 	}
@@ -481,7 +481,7 @@ System.out.println("\nMqttBrokerConnection->openConnection->Done with Pub and Su
 				name, topic);
 
 		try {
-			System.out.println("\nMqttBrokerConnection->startConsumer->"+subscriber.getTopic());
+			//System.out.println("\nMqttBrokerConnection->startConsumer->"+subscriber.getTopic());
 			client.subscribe(topic, qos);
 		} catch (Exception e) {
 			logger.error("Error starting consumer", e);
@@ -567,7 +567,7 @@ System.out.println("\nMqttBrokerConnection->openConnection->Done with Pub and Su
 	@Override
 	public void messageArrived(String topic, MqttMessage message)
 			throws Exception {
-		System.out.println("\nMqttBrokerConnection->messageArrived->"+topic+":->message:->"+new String(message.getPayload()));
+		//System.out.println("\nMqttBrokerConnection->messageArrived->"+topic+":->message:->"+new String(message.getPayload()));
 		logger.trace("Received message on topic '{}' : {}", topic, new String(
 				message.getPayload()));
 		for (MqttMessageConsumer consumer : consumers) {

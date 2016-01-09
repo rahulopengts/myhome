@@ -8,6 +8,7 @@ import com.google.common.eventbus.AsyncEventBus;
 import com.openhab.core.event.dto.EventObject;
 import com.openhab.core.event.handler.DataStoreHandler;
 import com.openhab.core.event.handler.IEventHandler;
+import com.openhab.core.event.handler.UIEventMessageHandler;
 
 public class AdminEventImpl implements IAdminEvent {
 	AsyncEventBus	asyncEventBus	=	null;
@@ -16,16 +17,22 @@ public class AdminEventImpl implements IAdminEvent {
 	public void dispatchEvent(EventObject eventObject,IEventHandler handler) {
 		// TODO Auto-generated method stub
 		try{
-			System.out.println("\nAdminEventImpl->dispatchEvent-00");
+			
+			System.out.println("\nAdminEventImpl->dispatchEvent-001");
 			AdminEventManager.getInstance().getAsyncEventBus().register(handler);
+			
 			System.out.println("\nAdminEventImpl->dispatchEvent-1");
 			AdminEventManager.getInstance().getAsyncEventBus().post(eventObject);
+			AdminEventManager.getInstance().getAsyncEventBus().unregister(handler);
 			System.out.println("\nAdminEventImpl->dispatchEvent-2");
 		} catch (Throwable e){
 			e.printStackTrace();
 		}
 	}
 
+	public void initializeBus(){
+		AdminEventManager.getInstance().getAsyncEventBus().register(new UIEventMessageHandler());
+	}
 	
 //	public void testNonAsyncEventSubscriber() throws Exception {
 //        asyncEventBus = new AsyncEventBus(Executors.newCachedThreadPool());

@@ -20,6 +20,7 @@ Import-Package: com.google.common.base,
  org.eclipse.xtext.resource,
  org.openhab.config.core,
  org.osgi.framework,
+ com.openhab.core.constant,
  org.osgi.service.cm,
  org.slf4j;version="1.5.11"
 Bundle-ActivationPolicy: lazy

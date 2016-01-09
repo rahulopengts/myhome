@@ -8,6 +8,8 @@
  */
 package org.openhab.core.autoupdate.internal;
 
+import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
+
 import org.openhab.core.autoupdate.AutoUpdateBindingProvider;
 import org.openhab.core.binding.AbstractBinding;
 import org.openhab.core.items.GenericItem;
@@ -61,9 +63,12 @@ public class AutoUpdateBinding extends AbstractBinding<AutoUpdateBindingProvider
 	 */
 	@Override
 	public void receiveCommand(String itemName, Command command) {
+		System.out.println("\nAutoUpdateBinding->receiveCommand->itemName->"+itemName+"->Command->"+command+"->Provider->");
 		Boolean autoUpdate = null;
 		for (AutoUpdateBindingProvider provider : providers) {
+			//System.out.println("\nAutoUpdateBinding->receiveCommand->itemName->"+itemName+"->Command->"+command+"->Provider->"+provider.getClass()+"getItemName");
 			Boolean au = provider.autoUpdate(itemName);
+			//System.out.println("\nAutoUpdateBinding->receiveCommand->itemName->"+itemName+"->Command->"+command+"->Provider->"+provider.getClass()+"->autoUpdate->"+au.toString());
 			if (au != null) {
 				autoUpdate = au;
 				if (Boolean.TRUE.equals(autoUpdate)) {
@@ -107,6 +112,7 @@ public class AutoUpdateBinding extends AbstractBinding<AutoUpdateBindingProvider
 					}
 				}				
 				if (isAccepted) {
+					System.out.println("\nAutoUpdateBinding->postUpdate->isAccepted->itemName->"+itemName+"->newStatus->"+newStatus);
 					item.setState(newStatus);
 				} else {
 					logger.debug("Received update of a not accepted type ("	+ newStatus.getClass().getSimpleName() + ") for item " + itemName);

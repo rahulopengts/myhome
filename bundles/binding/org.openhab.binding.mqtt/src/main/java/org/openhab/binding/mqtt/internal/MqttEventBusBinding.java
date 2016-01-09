@@ -117,13 +117,13 @@ public class MqttEventBusBinding extends AbstractBinding<MqttBindingProvider> im
 
 	@Override
 	public void receiveUpdate(String itemName, State newState) {
-		System.out.println("\nMqttEventBusBinding->receiveUpdate->itemName"+itemName+":newState:"+newState.toString()+":1");
+		//System.out.println("\nMqttEventBusBinding->receiveUpdate->itemName"+itemName+":newState:"+newState.toString()+":1");
 		if (newState == null || statePublisher == null
 				|| !statePublisher.isActivated()) {
-			System.out.println("\nMqttEventBusBinding->receiveUpdate->itemName"+itemName+":newState:"+newState.toString()+":2");
+			//System.out.println("\nMqttEventBusBinding->receiveUpdate->itemName"+itemName+":newState:"+newState.toString()+":2");
 			return;
 		}
-		System.out.println("\nMqttEventBusBinding->receiveUpdate->itemName"+itemName+":newState:"+newState.toString());
+		//System.out.println("\nMqttEventBusBinding->receiveUpdate->itemName"+itemName+":newState:"+newState.toString());
 		statePublisher.publish(statePublisher.getTopic(itemName), newState
 				.toString().getBytes());
 	}
@@ -133,7 +133,7 @@ public class MqttEventBusBinding extends AbstractBinding<MqttBindingProvider> im
 		if (commandPublisher == null || command == null || !commandPublisher.isActivated()) {
 			return;
 		}
-		System.out.println("\nMqttEventBusBinding->receiveCommand->itemName"+itemName+":newState:"+command.toString());
+		//System.out.println("\nMqttEventBusBinding->receiveCommand->itemName"+itemName+":newState:"+command.toString());
 		commandPublisher.publish(
 			commandPublisher.getTopic(itemName), command.toString().getBytes());
 	}

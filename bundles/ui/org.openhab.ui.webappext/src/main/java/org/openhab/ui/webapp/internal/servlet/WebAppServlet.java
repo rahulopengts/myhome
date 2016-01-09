@@ -122,7 +122,7 @@ public class WebAppServlet extends BaseServlet {
 				throw new RenderException("Sitemap '" + sitemapName + "' could not be found");
 			}
 			logger.debug("reading sitemap {}", sitemap.getName());
-			System.out.println("\n Sitemap Name : "+sitemap.getName());
+			//System.out.println("\n Sitemap Name : "+sitemap.getName());
 			if(widgetId==null || widgetId.isEmpty() || widgetId.equals("Home")) {
 				// we are at the homepage, so we render the children of the sitemap root node
 				String label = sitemap.getLabel()!=null ? sitemap.getLabel() : sitemapName;
@@ -136,11 +136,12 @@ public class WebAppServlet extends BaseServlet {
 				}
 				
 				StringBuilder testBuilder	=	renderer.processPage("Home", sitemapName, label, sitemap.getChildren(), async);
-				System.out.println("Chile Size : \n "+ childSize);
+				//System.out.println("Chile Size : \n "+ childSize);
 				result.append(testBuilder);
 			} else if(!widgetId.equals("Colorpicker")) {
 				// we are on some subpage, so we have to render the children of the widget that has been selected
 				Widget w = renderer.getItemUIRegistry().getWidget(sitemap, widgetId);
+				System.out.println("\nWebAppServlet->widgetId->"+widgetId+":Widget:"+w);
 				if(w!=null) {
 					if(!(w instanceof LinkableWidget)) {
 						throw new RenderException("Widget '" + w + "' can not have any content");
@@ -151,11 +152,13 @@ public class WebAppServlet extends BaseServlet {
 					if(poll && waitForChanges(children)==false) {
 						// we have reached the timeout, so we do not return any content as nothing has changed
 						res.getWriter().append(getTimeoutResponse()).close();
+						System.out.println("\nWebAppServlet->widgetId->No Change"+widgetId+":Widget:"+w);
 						return;
 					}
+					System.out.println("\nWebAppServlet->widgetId->Changed"+widgetId+":Widget:"+w);
 					String label = renderer.getItemUIRegistry().getLabel(w);
 					if (label==null) label = "undefined";
-					result.append(renderer.processPage(renderer.getItemUIRegistry().getWidgetId(w), sitemapName, label, children, async));
+						result.append(renderer.processPage(renderer.getItemUIRegistry().getWidgetId(w), sitemapName, label, children, async));
 				}
 				
 			}

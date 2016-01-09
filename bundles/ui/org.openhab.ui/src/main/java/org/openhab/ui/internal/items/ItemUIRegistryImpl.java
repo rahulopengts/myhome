@@ -222,6 +222,8 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 	public String getLabel(Widget w) {
 		String label = getLabelFromWidget(w);
 		
+		//System.out.println("\nItemUIRegistryImpl->getLabel->Widget->"+w.getItem()+"Label->"+label);
+		
 		// now insert the value, if the state is a string or decimal value and there is some formatting pattern defined in the label 
 		// (i.e. it contains at least a %)
 		String itemName = w.getItem();
@@ -239,13 +241,17 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 				// and will cause an 'java.util.IllegalFormatConversionException:
 				// d != java.lang.String' later on when trying to format a String
 				// as %d (number).
+				//System.out.println("\nItemUIRegistryImpl->getLabel->itemName->"+itemName);
 				if (label.contains("%d")) {
 					// a number is requested
+					//System.out.println("\nItemUIRegistryImpl->getLabel->contains%d->"+label);
 					state = item.getState();
 					if(!(state instanceof DecimalType)) {
+						//System.out.println("\nItemUIRegistryImpl->getLabel->instanceof DecimalType->"+label);
 						state = item.getStateAs(DecimalType.class);
 					}
 				} else {
+					//System.out.println("\nItemUIRegistryImpl->getLabel->does not contain %->"+label);
 					state = item.getState();
 				}
 			} catch (ItemNotFoundException e) {
@@ -254,13 +260,16 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 
 			if (state==null || state instanceof UnDefType) {
 				formatPattern = formatUndefined(formatPattern);
+				//System.out.println("\nItemUIRegistryImpl->getLabel->formatPattern state not null and undeftype->");
 			} else if (state instanceof Type) {
 				// The following exception handling has been added to work around a Java bug with formatting
 				// numbers. See http://bugs.sun.com/view_bug.do?bug_id=6476425
 				// Without this catch, the whole sitemap, or page can not be displayed!
 				// This also handles IllegalFormatConverionException, which is a subclass of IllegalArgument.
 				try {
+					
 					formatPattern = ((Type) state).format(formatPattern);
+					//System.out.println("\nItemUIRegistryImpl->getLabel->formatPattern of type state->"+formatPattern);
 				}
 				catch(IllegalArgumentException e) {
 					logger.warn(
@@ -273,8 +282,9 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 			label = label.substring(0, indexOpenBracket + 1) + formatPattern + label.substring(indexCloseBracket);
 		}
 		
+		//System.out.println("\nItemUIRegistryImpl->getLabel->before transform->"+itemName+"Label->"+label);
 		label = transform(label);
-		
+		//System.out.println("\nItemUIRegistryImpl->getLabel->itemName->"+itemName+"Label->"+label);
 		return label;
 	}
 

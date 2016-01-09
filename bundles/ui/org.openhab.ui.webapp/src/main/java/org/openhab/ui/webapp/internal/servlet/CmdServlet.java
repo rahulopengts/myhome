@@ -27,9 +27,12 @@ import org.openhab.core.items.ItemNotFoundException;
 import org.openhab.core.items.ItemRegistry;
 import org.openhab.core.library.items.SwitchItem;
 import org.openhab.core.library.types.OnOffType;
+import org.openhab.core.persistence.internal.PersistenceManager;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.TypeParser;
+import org.openhab.model.core.ModelRepository;
 import org.openhab.model.core.internal.folder.FolderObserver;
+import org.openhab.model.rule.internal.engine.RuleEngine;
 import org.openhab.ui.webapp.cloud.exception.CloudException;
 import org.openhab.ui.webapp.cloud.exception.CloudExceptionManager;
 import org.openhab.ui.webapp.cloud.exception.CloudMessageConstants;
@@ -39,7 +42,11 @@ import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openhab.core.constant.CloudHomeAutoConstants;
+import com.openhab.core.event.dto.EventObject;
 import com.openhab.core.event.handler.EventManager;
+import com.openhab.core.internal.event.processor.CloudAutoUpdateBinding;
+import com.openhab.core.threadstore.CloudThreadLocalStorage;
 
 /**
  * This servlet receives events from the web app and sends these as
@@ -90,10 +97,32 @@ public class CmdServlet extends BaseServlet {
 	public void service(ServletRequest req, ServletResponse res)
 			throws ServletException, IOException {
 		//System.out.println("\nCmdServlet->service->eventPublisher->"+eventPublisher.getClass().getCanonicalName());
+		ModelRepository	cloudModelRepository	=	null;
+		ItemRegistry	cloudItemRegistry		=	null;
+		PersistenceManager persistenceManager	=	null;
+		RuleEngine ruleEngine	=	null;
+		EventObject	eventObject	=	null;
 		
 		if(FolderObserver.CLOUD_MODE){
 			try{
-				validateSession((HttpServletRequest)req,(HttpServletResponse)res);
+				
+				persistenceManager	=	(PersistenceManager)CloudSessionManager.getAttribute(CloudSessionManager.getSession((HttpServletRequest)req, (HttpServletResponse)res), CloudSessionManager.PERSISTENCEMANAGER);
+				ruleEngine	=	(RuleEngine)CloudSessionManager.getAttribute(CloudSessionManager.getSession((HttpServletRequest)req, (HttpServletResponse)res), CloudSessionManager.RULEENGINE);
+				cloudItemRegistry	=	validateAndGetItemRegistry((HttpServletRequest)req,(HttpServletResponse)res,cloudModelRepository);
+				cloudModelRepository=	validateAndGetModelRepository((HttpServletRequest)req,(HttpServletResponse)res);
+				
+				
+				//Create EventObject
+				eventObject	=	new EventObject();
+				eventObject.setItemRegistry(cloudItemRegistry);
+				eventObject.setModelRepository(cloudModelRepository);
+				eventObject.setRuleEngine(ruleEngine);
+				eventObject.setPersistanceManager(persistenceManager);
+
+				CloudThreadLocalStorage.setLocalEventObject(eventObject);
+				CloudThreadLocalStorage.setLocalHomeId("RR");
+				System.out.println("\nCmdServlet->eventObject->"+Thread.currentThread().getId()+":EVENTOBJECT:"+eventObject);
+				
 				eventPublisher	=	(EventPublisher)CloudSessionManager.getAttribute(CloudSessionManager.getSession((HttpServletRequest)req, (HttpServletResponse)res), CloudSessionManager.EVENTPUBLISHER);
 				//EventPublisher eventPublisher	=	new EventPublisherImpl();
 				EventAdmin	eventAdmin	=	new EventComponent();
@@ -111,7 +140,13 @@ public class CmdServlet extends BaseServlet {
 				String commandName = req.getParameter(itemName);
 				try {
 					System.out.println("\n CmdServlet->service-> DOES NOT START WITH->_ And Submitted Command Name Is "+commandName);
-					Item item = itemRegistry.getItem(itemName);
+					Item item =	null; 
+					if(CloudHomeAutoConstants.CLOUD_MODE){
+						item	=	cloudItemRegistry.getItem(itemName);
+					} else {
+						item	=	itemRegistry.getItem(itemName);
+					}
+							
 					
 					// we need a special treatment for the "TOGGLE" command of switches;
 					// this is no command officially supported and must be translated 
@@ -130,12 +165,14 @@ public class CmdServlet extends BaseServlet {
 						System.out.println("\n CmdServlet->service-> Command is Before :"+commandName+" :\n Command Type :"+command.getClass().getSimpleName());
 						
 						if(FolderObserver.CLOUD_MODE){
+							
 							EventManager	eventManager	=	new EventManager();
-							eventManager.publishData(itemName, command, itemRegistry);
+							
+							eventManager.publishData(itemName, command, cloudItemRegistry,cloudModelRepository,persistenceManager,ruleEngine,eventObject);
+						} else {
+							eventPublisher.sendCommand(itemName, command);
+							System.out.println("\n CmdServlet->service-> Command is "+commandName+" :\n Command Type :"+command.getClass().getSimpleName());
 						}
-						
-						eventPublisher.sendCommand(itemName, command);
-						System.out.println("\n CmdServlet->service-> Command is "+commandName+" :\n Command Type :"+command.getClass().getSimpleName());
 					} else {
 						logger.warn("Received unknown command '{}' for item '{}'", commandName, itemName);						
 					}
@@ -146,26 +183,55 @@ public class CmdServlet extends BaseServlet {
 		}
 	}
 
-	private void validateSession(HttpServletRequest req,HttpServletResponse res) throws ServletException{
+	private ItemRegistry validateAndGetItemRegistry(HttpServletRequest req,HttpServletResponse res,ModelRepository cloudModelRepository) throws ServletException{
 		//EventPublisherImpl
+		ItemRegistry cloudItemRegistry	=	null;
 		try{
 			HttpSession	session	=	CloudSessionManager.getSession(req, res);
 			
-			itemRegistry	=	(ItemRegistry)CloudSessionManager.getAttribute(session, CloudSessionManager.ITEMREGISTRY);
-			if(itemRegistry==null){
+			cloudItemRegistry	=	(ItemRegistry)CloudSessionManager.getAttribute(session, CloudSessionManager.ITEMREGISTRY);
+			if(cloudItemRegistry==null){
 				CloudExceptionManager.throwException(CloudMessageConstants.ATTRIBUTE_NULL, null, CloudSessionManager.ITEMREGISTRY+"is null");
 			}
+			
+			cloudModelRepository	=	(ModelRepository)CloudSessionManager.getAttribute(session, CloudSessionManager.MODELREPO);
+			if(cloudModelRepository==null){
+				CloudExceptionManager.throwException(CloudMessageConstants.ATTRIBUTE_NULL, null, CloudSessionManager.MODELREPO+"is null");
+			}
+			
 		} catch (CloudException excp){
 			excp.printStackTrace();
 			throw new ServletException(CloudSessionManager.ITEMREGISTRY+"is null");
 		}
 		//itemRegistry		
-		
+		return cloudItemRegistry;
 //		EventPublisher eventPublisher	=	new EventPublisherImpl();
 //		EventAdmin	eventAdmin	=	new EventComponent();
 //		((EventPublisherImpl)eventPublisher).setEventAdmin(eventAdmin);
 	}
 
+	private ModelRepository validateAndGetModelRepository(HttpServletRequest req,HttpServletResponse res) throws ServletException{
+		//EventPublisherImpl
+		ModelRepository cloudModelRepository	=	null;
+		
+		try{
+			HttpSession	session	=	CloudSessionManager.getSession(req, res);
+			cloudModelRepository	=	(ModelRepository)CloudSessionManager.getAttribute(session, CloudSessionManager.MODELREPO);
+			if(cloudModelRepository==null){
+				CloudExceptionManager.throwException(CloudMessageConstants.ATTRIBUTE_NULL, null, CloudSessionManager.MODELREPO+"is null");
+			}
+			
+		} catch (CloudException excp){
+			excp.printStackTrace();
+			throw new ServletException(CloudSessionManager.ITEMREGISTRY+"is null");
+		}
+		//itemRegistry		
+		return cloudModelRepository;
+//		EventPublisher eventPublisher	=	new EventPublisherImpl();
+//		EventAdmin	eventAdmin	=	new EventComponent();
+//		((EventPublisherImpl)eventPublisher).setEventAdmin(eventAdmin);
+	}
+	
 //	at org.openhab.persistence.rrd4j.internal.RRD4jService.store(RRD4jService.java:154)
 //	at org.openhab.core.persistence.internal.PersistenceManager.handleStateEvent(PersistenceManager.java:243)
 //	at org.openhab.core.persistence.internal.PersistenceManager.stateChanged(PersistenceManager.java:222)

@@ -54,8 +54,11 @@ public class ScriptImpl implements Script {
 	}
 
 	public Object execute(IEvaluationContext evaluationContext) throws ScriptExecutionException {
+		
 		if(xExpression!=null) {
-		    try {
+			//CloudThreadLocalStorage.setLocalHomeId("HOME1");
+		    System.out.println("\nScriptImpl->execute->HOME1");
+			try {
 		    	IEvaluationResult result = interpreter.evaluate(xExpression, evaluationContext, CancelIndicator.NullImpl);
 			    if(result==null) {
 			    	// this can only happen on an InterpreterCancelledException, i.e. NEVER ;-)

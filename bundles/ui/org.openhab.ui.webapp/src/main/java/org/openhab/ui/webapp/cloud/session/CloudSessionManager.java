@@ -14,6 +14,9 @@ public class CloudSessionManager {
 	public static final String MODELREPO		=	"MODELREPO";
 	public static final String ITEMREGISTRY		=	"ITEMREGISTRY";
 	public static final String EVENTPUBLISHER		=	"EVENTPUBLISHER";
+	public static final String PERSISTENCEMANAGER		=	"PERSISTENCEMANAGER";
+	
+	public static final String RULEENGINE		=	"RULEENGINE";
 	
 	public static HttpSession getSession(HttpServletRequest	request,HttpServletResponse response) throws  CloudException{
 		HttpSession session	=	null;

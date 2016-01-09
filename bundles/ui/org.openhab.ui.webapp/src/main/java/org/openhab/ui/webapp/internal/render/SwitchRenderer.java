@@ -81,8 +81,9 @@ public class SwitchRenderer extends AbstractWidgetRenderer {
 		
 		State state = itemUIRegistry.getState(w);
 		
-		//System.out.println("\nSwitchRenderer->getState->"+state.toString());
+		System.out.println("\nSwitchRenderer->getState->"+state.toString());
 		if(s.getMappings().size()==0) {
+			
 			if(state instanceof PercentType) {
 				state = ((PercentType) state).intValue() > 0 ? OnOffType.ON : OnOffType.OFF;
 			}

@@ -2,19 +2,13 @@ package com.homeauto.mqtt.common;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.homeauto.common.ComponentInfo;
-import com.homeauto.dataprocessors.AnalogueDataProcessor;
-import com.homeauto.dataprocessors.IDataProcessors;
-import com.homeauto.mqtt.MessagePublisher;
+import com.openhab.core.event.messaging.mqtt.MessagePublisher;
 
 //O12345678900011
 //I139990000AAAAA
@@ -124,78 +118,6 @@ public class Utility {
     }
 	//#I11219010 0 A A A #
     //0123456789
-	public static List<ComponentInfo> processInboundMessage(String inboundMessage){
-		ArrayList<ComponentInfo> componentStateList	=	new ArrayList<ComponentInfo>();
-		if(inboundMessage!=null && inboundMessage.length()<15){
-			if(logger.isDebugEnabled()){
-			logger.debug("\n Not to be processed : "+inboundMessage);
-			}
-			return null;
-		}
-		if(inboundMessage.contains("I")){
-		String processMessage	=	inboundMessage.substring(1,14);
-		if(logger.isDebugEnabled()){
-			logger.debug("\n to be processed : "+processMessage);
-		}
-		StringBuffer receivedBuffer	=	new StringBuffer(processMessage);
-		receivedBuffer.insert(1, 'L');
-		receivedBuffer.insert(3, 'N');
-		receivedBuffer.insert(5, 'L');
-		receivedBuffer.insert(7, 'N');
-		//IL1N1L2N1 9 1001 AAAAA
-		String nodeId	=	(receivedBuffer.toString()).substring(1,9);
-		if(logger.isDebugEnabled()){
-			logger.debug("\n Node Id : "+nodeId);
-		}
-		//11-14
-		
-
-		
-		pub	=	MessagePublisher.getMessagePublisher();
-
-		IDataProcessors	dataProcessor	=	AnalogueDataProcessor.getProcessorClass(inboundMessage);
-		if(dataProcessor!=null){
-			if(logger.isDebugEnabled()){
-				logger.debug("Value to be processed "+inboundMessage);
-			}
-			String dataToBePublished	=	dataProcessor.processInboundData(inboundMessage,nodeId);
-			
-			char analogueDataType	=	inboundMessage.charAt(AnalogueDataProcessor.ANALOGUE_VAL_INDICATOR_POS);
-			if(analogueDataType==AnalogueDataProcessor.ANALOGUE_LIGHT_BATTERY_CHAR){
-				//This is only for battery as of now.
-				nodeId	=	nodeId+"B"+processMessage.charAt(AnalogueDataProcessor.BATTER_COMPONENT_ID);
-			}
-			if(dataToBePublished!=null){
-				publishMessage(nodeId, dataToBePublished);
-				return null;
-			}
-		}
-		
-		for(int i=0;i<=3;i++){
-			char c	=	receivedBuffer.toString().charAt(i+SWITCHSTATE_OFFSET);	
-			if(logger.isDebugEnabled()){
-			logger.debug("State"+c);
-			}
-			ComponentInfo compInfo	=	new ComponentInfo();
-			compInfo.setNodeId(nodeId);
-			compInfo.setChildId(""+i);
-			if(c=='1'){
-				compInfo.setCompState("ON");
-				publishMessage(nodeId+"S"+i,"ON");
-			} else {
-				compInfo.setCompState("OFF");
-				publishMessage(nodeId+"S"+i,"OFF");
-			}
-			componentStateList.add(compInfo);
-			
-		}
-		
-		}
-		return componentStateList;
-	}
-	//I1121 S 1001 AAAAA
-	//I1234 5 6789 
-	
 	public static void publishMessage(String componentId,String state){
     	if(logger.isDebugEnabled()){
     		logger.debug("Data received on the Serial port is "+state+" for Node Id : "+componentId);
@@ -210,14 +132,6 @@ public class Utility {
 	public static void main(String arg[]){
 		
 		String	m	=	"I1121 S 1001 AAAAA";
-		List<ComponentInfo> c	=	processInboundMessage("#I112190100AAA#");
-		Iterator iterate	=	c.iterator();
-		while(iterate.hasNext()){
-			ComponentInfo	info	=	(ComponentInfo)iterate.next();
-	    	if(logger.isDebugEnabled()){
-	    		logger.debug("\n Info "+info.getNodeId()+"S"+info.getChildId());
-	    	}
-	    }
 		
 	}
 }
