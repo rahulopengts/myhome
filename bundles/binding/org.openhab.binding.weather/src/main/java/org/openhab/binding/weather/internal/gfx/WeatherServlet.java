@@ -70,7 +70,7 @@ public class WeatherServlet extends HttpServlet {
 	protected void activate() {
 		try {
 			logger.debug("Starting up weather servlet at " + SERVLET_NAME);
-
+			System.out.println("\n Weather-WeatherSerlet->activate->"+this);
 			Hashtable<String, String> props = new Hashtable<String, String>();
 			httpService.registerServlet(SERVLET_NAME, this, props, createHttpContext());
 

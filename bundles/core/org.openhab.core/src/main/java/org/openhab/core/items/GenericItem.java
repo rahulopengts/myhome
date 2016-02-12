@@ -134,7 +134,7 @@ abstract public class GenericItem implements Item {
 
 	public void addStateChangeListener(StateChangeListener listener) {
 		synchronized(listeners) {
-			System.out.println("\nGenericItem->addStateChangeListener->listener->"+listener);
+			System.out.println("\nGenericItem->addStateChangeListener->listener->"+listener.getClass());
 			listeners.add(listener);
 		}
 	}

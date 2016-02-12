@@ -35,6 +35,7 @@ public final class TransformationActivator implements BundleActivator {
 	 */
 	public void start(BundleContext bc) throws Exception {
 		context = bc;
+		System.out.println("TransformationActivator->start->");
 		logger.debug("Transformation Service has been started.");
 	}
 

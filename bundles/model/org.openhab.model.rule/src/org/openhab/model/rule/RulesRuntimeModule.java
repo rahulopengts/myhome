@@ -34,33 +34,39 @@ public class RulesRuntimeModule extends org.openhab.model.rule.AbstractRulesRunt
 	}
 	
 	public Class<? extends ExtensionClassNameProvider> bindExtensionClassNameProvider() {
+		System.out.println("\nRulesRuntimeModule->bindExtensionClassNameProvider->");
 		return RuleExtensionClassNameProvider.class;
 	}
 	
 	public Class<StateAndCommandProvider> bindStateAndCommandProvider() {
+		System.out.println("\nRulesRuntimeModule->bindStateAndCommandProvider->");
 		return StateAndCommandProvider.class;
 	}
 	
 	@Override
 	public Class<? extends IScopeProvider> bindIScopeProvider() {
+		System.out.println("\nRulesRuntimeModule->bindIScopeProvider->");
 		return RulesScopeProvider.class;
 	}
 	
 	/* we need this so that our pluggable actions can be resolved at design time */
 	@Override
 	public Class<? extends org.eclipse.xtext.common.types.access.IJvmTypeProvider.Factory> bindIJvmTypeProvider$Factory() {
+		System.out.println("\nRulesRuntimeModule->bindIJvmTypeProvider$Factory->");
 		return ActionClasspathTypeProviderFactory.class;
 	}
 	
 	/* we need this so that our pluggable actions can be resolved when being parsed at runtime */
 	@Override
 	public Class<? extends org.eclipse.xtext.common.types.xtext.AbstractTypeScopeProvider> bindAbstractTypeScopeProvider() {
+		System.out.println("\nRulesRuntimeModule->bindAbstractTypeScopeProvider$Factory->");
 		return ActionClasspathBasedTypeScopeProvider.class;
 	}
 
 	/* we need this so that our pluggable actions can be resolved when being executed at runtime */
 	@Override
 	public ClassLoader bindClassLoaderToInstance() {
+		System.out.println("\nRulesRuntimeModule->bindClassLoaderToInstance->");
 		return new ActionClassLoader(getClass().getClassLoader());
 	}
 }

@@ -9,11 +9,15 @@
 package org.openhab.binding.mqtt.internal;
 
 import org.apache.commons.lang.StringUtils;
+import org.openhab.core.transform.CloudTransformationHelper;
+import org.openhab.core.transform.TransformationHelper;
+import org.openhab.core.transform.TransformationService;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.openhab.io.transport.mqtt.MqttMessageProducer;
 import org.openhab.io.transport.mqtt.MqttSenderChannel;
 import org.openhab.model.item.binding.BindingConfigParseException;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +97,8 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 				setTransformationRule(config[4].trim());
 				initTransformService();
 			}
+			
+			System.out.println("\n MqttMessagePublisher : "+configuration+":trigger:"+trigger+":MessageType:"+getMessageType());
 
 		} catch (BindingConfigParseException e) {
 			throw new BindingConfigParseException("Configuration '"
@@ -158,27 +164,29 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 		}
 
 		String content = value;
-
+		System.out.println("\n MqttMessagePublisher : createMessage -0 value :->"+value) ;
+		String s	=	getTransformationServiceParam();
+		System.out.println("\n MqttMessagePublisher : createMessage -0 transformationParam:->"+s) ;
 		if (getTransformationService() != null) {
-			//System.out.println("\n MqttMessagePublisher : createMessage -1") ;
+			System.out.println("\n MqttMessagePublisher : createMessage -1-getTransformationServiceParam()->") ;
 			content = getTransformationService().transform(getTransformationServiceParam(), value);
-			//System.out.println("\n MqttMessagePublisher : createMessage content "+content) ;
+			System.out.println("\n MqttMessagePublisher : createMessage content "+content) ;
 		} else if (getTransformationRule() != null && !getTransformationRule().equalsIgnoreCase("default")) {
 			
 			content = getTransformationRule();
-			//System.out.println("\n MqttMessagePublisher : createMessage -2 content "+content) ;
+			System.out.println("\n MqttMessagePublisher : createMessage -2 content "+content) ;
 		}
 
 		if (getMessageType().equals(MessageType.STATE)) {
 			
 			content = StringUtils.replace(content, "${state}", value);
-			//System.out.println("\n MqttMessagePublisher : createMessage -3 state"+content) ;
+			System.out.println("\n MqttMessagePublisher : createMessage -3 state"+content) ;
 		} else {
 			content = StringUtils.replace(content, "${command}", value);
-			//System.out.println("\n MqttMessagePublisher : createMessage -4 state"+content) ;
+			System.out.println("\n MqttMessagePublisher : createMessage -4 state"+content) ;
 		}
 		content = StringUtils.replace(content, "${itemName}", getItemName());
-		//System.out.println("\n MqttMessagePublisher : createMessage -Final "+content) ;
+		System.out.println("\n MqttMessagePublisher : createMessage -Final "+content) ;
 		return content.getBytes();
 	}
 
@@ -237,5 +245,27 @@ public class MqttMessagePublisher extends AbstractMqttMessagePubSub implements
 	public String getTopic(String itemName) {
 		return StringUtils.replace(getTopic(), "${item}", itemName);
 	}
-	
+
+	@Override
+	protected void initTransformService() {
+		// TODO Auto-generated method stub
+		
+		if (getTransformationService() != null || StringUtils.isBlank(getTransformationServiceName())) {
+			return;
+		}
+
+		String transformationServiceType	=	getTransformationServiceName();
+		System.out.println("\nMqttMessagePublisher->initTransformService->"+getTransformationServiceName());
+		
+		
+		if(transformationServiceType!=null && transformationServiceType.equals("JAVA")){
+			TransformationService	transformationService	=	CloudTransformationHelper.getTransformationService(transformationServiceType);
+			setTransformationService(transformationService);
+			System.out.println("\nMqttMessagePublisher->initTransformService->done for cloud");
+			//TransformationService	transformationService	=	new 	
+		} else {
+			super.initTransformService();			
+		}
+
+	}
 }

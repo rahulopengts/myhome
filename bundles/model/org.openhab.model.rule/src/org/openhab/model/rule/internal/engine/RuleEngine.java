@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.openhab.core.constant.CloudHomeAutoConstants;
+import com.openhab.core.threadstore.CloudThreadLocalStorage;
 
 
 /**
@@ -178,15 +179,15 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 				
 				System.out.println("\nRuleEngine->stateChanged->Rule->"+rules+"->"+rules.toString()+"->QualifiedName->"+QualifiedName.create(RuleContextHelper.VAR_PREVIOUS_STATE));
 				Iterator<Rule>	ruleIterator	=	rules.iterator();
-				if(CloudHomeAutoConstants.CLOUD_MODE){
-					while(ruleIterator.hasNext()){
-						Rule rule	=	ruleIterator.next();
-						System.out.println("\nRuleEngine->stateChanged->Rule->Identified Rules->"+rule);	
-					}
-					
-				} else {
+//				if(CloudHomeAutoConstants.CLOUD_MODE){
+//					while(ruleIterator.hasNext()){
+//						Rule rule	=	ruleIterator.next();
+//						System.out.println("\nRuleEngine->stateChanged->Rule->Identified Rules->"+rule);	
+//					}
+//					
+//				} else {
 					executeRules(rules, context);
-				}
+//				}
 				
 			}
 		}
@@ -205,8 +206,9 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 			System.out.println("\nRuleEngine->receiveCommand->1->itemName"+itemName+"->oldState->"+itemName+"->newState->"+command);
 			if(triggerManager!=null && itemRegistry!=null) {
 				try {
-					System.out.println("\nRuleEngine->receiveCommand->2->itemName"+itemName+"->newState->"+command);
 					Item item = itemRegistry.getItem(itemName);
+					System.out.println("\nRuleEngine->receiveCommand->2->itemName"+itemName+"->command->"+command+"newState->"+item.getState()+"->Class->"+item.getState().getClass());
+
 					Iterable<Rule> rules = triggerManager.getRules(COMMAND, item, command);
 					RuleEvaluationContext context = new RuleEvaluationContext();
 					context.newValue(QualifiedName.create(RuleContextHelper.VAR_RECEIVED_COMMAND), command);
@@ -315,6 +317,8 @@ public class RuleEngine implements EventHandler, ItemRegistryChangeListener, Sta
 		}
 			
 		protected synchronized void executeRule(Rule rule, RuleEvaluationContext context) {
+			
+			System.out.println("\nRuleEngine->e->MasterData->"+Thread.currentThread().getId()+":MasterData:"+CloudThreadLocalStorage.getCloudMasterData());				
 			
 			Script script = scriptEngine.newScriptFromXExpression(rule.getScript());
 			

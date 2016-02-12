@@ -30,6 +30,7 @@ public class OpenWeatherMapProvider extends AbstractWeatherProvider {
 	 */
 	@Override
 	public ProviderName getProviderName() {
+		System.out.println("\nYahooProvider->getProvideName->YAHOO");
 		return ProviderName.OPENWEATHERMAP;
 	}
 

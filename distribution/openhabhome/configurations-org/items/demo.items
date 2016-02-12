@@ -1,0 +1,130 @@
+	Group All
+
+Group gFF 		(All)
+Group rHFF 		(All)
+Group gC 		(All)
+Group Outdoor 	(All)
+Group Shutters 	(All)
+Group Weather 	(All)
+Group Status 	(All)
+Group health 		(All)
+
+Group RH_Living 	"Drawing Room" 	<bedroom> 	(rHFF)
+Group RH_Kitchen 	"Top Master Room" <bedroom> 	(rHFF)
+Group RH_Toilet 	"Toilet" 		<bath> 		(rHFF)
+Group RH_Corridor 	"Garage" 		<corridor> 	(rHFF)
+
+
+
+/* active groups */
+Group:Switch:OR(ON, OFF) 		Lights 		"All Lights [(%d)]" 								(All)
+Group:Switch:OR(ON, OFF) 		Heating 	"No. of Active Heatings [(%d)]" 	<heating> 		(All)
+Group:Contact:OR(OPEN, CLOSED) 	Windows 	"Open windows [(%d)]"				<contact>		(All)
+
+
+
+Switch Fan (RH_Living) {mqtt=">[mosquitto:openHAB:command:ON:1-2-1-1],>[mosquitto:openHAB:command:OFF:default]"} 
+//Switch Light "Right Light" (RH_Living) {mqtt=">[mosquitto:openHAB:state:ON:1-2-1-2],>[mosquitto:openHAB:state:OFF:default]"} 
+	
+Switch Light "Right-Bulb" (RH_Living) {mqtt=">[mosquitto:/nancy/kitchen/dishwasher:command:ON:ONRH_LIGHT],>[mosquitto:/nancy/kitchen/dishwasher:command:OFF:OFFRH_LIGHT],<[mosquitto:/RH_LIVING:state:default]"}
+
+
+Switch	Dishwasher "Dish1" (RH_Living) {mqtt=">[mosquitto:/nancy/kitchen/dishwasher:command:ON:ONDISH1],>[mosquitto:/nancy/kitchen/dishwasher:command:OFF:OFFDISH],<[mosquitto:/RH_DISH:state:default]"}
+
+Switch	Node01 (RH_Living) {mqtt=">[mosquitto:/raspberry:command:ON:OL1N1L9N9S1100000000],>[mosquitto:/raspberry:command:OFF:OL1N1L9N9S1000000000],<[mosquitto:/L1N1L9N9S1:state:default]"}
+//OL1N1L9N9S1000000000
+
+
+
+Switch	Node02 (RH_Living) {mqtt=">[mosquitto:/raspberry:command:ON:OL1N0L2N1S1100000000],>[mosquitto:/raspberry:command:OFF:OL1N0L2N1S1000000000],<[mosquitto:/L1N2L9N9S1:state:default]"}
+
+
+Switch	Node03 (RH_Living) {mqtt=">[mosquitto:/raspberry:command:ON:OL1N0L2N0S1100000000],>[mosquitto:/raspberry:command:OFF:OL1N0L2N0S1000000000],<[mosquitto:/L1N0L2N0S1:state:default]"}
+
+Switch	Node04 (RH_Living) {mqtt=">[mosquitto:/raspberry:command:ON:OL1N4L9N9S1100000000],>[mosquitto:/raspberry:command:OFF:OL1N4L9N9S1000000000],<[mosquitto:/L1N4L9N9S1:state:default]"}
+
+Switch	Node05S0 (RH_Corridor) {mqtt=">[mosquitto:/raspberry:command:ON:OL1N5L9N9S0100000000],>[mosquitto:/raspberry:command:OFF:OL1N5L9N9S0000000000],<[mosquitto:/L1N5L9N9S0:state:default]"}
+
+Switch	Node05S1 (RH_Corridor) {mqtt=">[mosquitto:/raspberry:command:ON:OL1N5L9N9S1100000000],>[mosquitto:/raspberry:command:OFF:OL1N5L9N9S1000000000],<[mosquitto:/L1N5L9N9S1:state:default]"}
+
+Switch	Node05S2 (RH_Corridor) {mqtt=">[mosquitto:/raspberry:command:ON:OL1N5L9N9S2100000000],>[mosquitto:/raspberry:command:OFF:OL1N5L9N9S2000000000],<[mosquitto:/L1N5L9N9S2:state:default]"}
+
+Switch	Node05S33 (RH_Corridor) {mqtt=">[mosquitto:/raspberry:command:ON:OL1N5L9N9S3100000000],>[mosquitto:/raspberry:command:OFF:OL1N5L9N9S3000000000],<[mosquitto:/L1N5L9N9S3:state:default]"}
+
+Group:Contact:OR(OPEN, CLOSED) 	Window 	"Open windows [(%d)]"				<contact>		(RH_Kitchen)
+
+Number dayPhase "Phase Of The Day  1" (RH_Corridor) {mqtt="<[mosquitto:/L1N1L2N1:state:default]"}
+
+Number	repeaterBattery	"Battery Life [%d]" (health) {mqtt="<[mosquitto:/L1N1L9N9B0:state:default]"}
+
+//[MAP(en.map):%.1f]
+//
+//Switch AirCondition1 (RH_Living) {mqtt=">[mosquitto:openHAB:command:ON:default],>[mosquitto:openHAB:command:OFF:default],<[mosquitto:openHABIN:command:ON:default],<[mosquitto:openHABIN:command:OFF:default]"}
+
+//>[mosquitto:/nancy/kitchen/dishwasher:command:ON:default]
+//>[mosquitto:/nancy/kitchen/dishwasher:command:OFF:default]
+//<[mosquitto:/nancy/kitchen/dishwasher:state:default]
+
+//Switch doorbell {mqtt="<[mybroker:/myHome/doorbell:command:ON]"}
+
+/* Rollershutters */
+Switch Shutter_all (Shutters)
+
+Rollershutter Shutter_GF_Toilet 		"Toilet"		(GF_Toilet, Shutters)
+Rollershutter Shutter_GF_Kitchen 		"Kitchen"		(GF_Kitchen, Shutters)
+Rollershutter Shutter_GF_Living 		"Livingroom"	(GF_Living, Shutters)
+
+Rollershutter Shutter_FF_Bed 			"Bedroom"		(FF_Bed, Shutters)
+Rollershutter Shutter_FF_Bath 			"Bath"			(FF_Bath, Shutters)
+Rollershutter Shutter_FF_Office_Window	"Office Window"	(FF_Office, Shutters)
+Rollershutter Shutter_FF_Office_Door 	"Office Door"	(FF_Office, Shutters)
+
+/* Indoor Temperatures */
+Number Temperature_GF_Corridor 	"Temperature [%.1f Â°C]"	<temperature>	(Temperature, GF_Corridor)
+Number Temperature_GF_Toilet 	"Temperature [%.1f Â°C]"	<temperature>	(Temperature, GF_Toilet)
+Number Temperature_GF_Living 	"Temperature [%.1f Â°C]"	<temperature>	(Temperature, GF_Living)
+Number Temperature_GF_Kitchen 	"Temperature [%.1f Â°C]"	<temperature>	(Temperature, GF_Kitchen)
+Number Temperature_FF_Bath 		"Temperature [%.1f Â°C]"	<temperature>	(Temperature, FF_Bath)
+Number Temperature_FF_Office 	"Temperature [%.1f Â°C]"	<temperature>	(Temperature, FF_Office)
+Number Temperature_FF_Child 	"Temperature [%.1f Â°C]"	<temperature>	(Temperature, FF_Child)
+Number Temperature_FF_Bed 		"Temperature [%.1f Â°C]"	<temperature>	(Temperature, FF_Bed)
+
+
+/* Window */
+Contact Windows_GF_Frontdoor 	"Frontdoor [MAP(en.map):%s]"		(RH_Kitchen, Window)
+Contact Windows_GF_Kitchen 		"Kitchen [MAP(en.map):%s]"			(RH_Kitchen, Window)
+
+
+/* Windows */
+Contact Window_GF_Frontdoor 	"Frontdoor [MAP(en.map):%s]"		(GF_Corridor, Windows)
+Contact Window_GF_Kitchen 		"Kitchen [MAP(en.map):%s]"			(GF_Kitchen, Windows)
+Contact Window_GF_Living 		"Terrace door [MAP(en.map):%s]"		(GF_Living, Windows)
+Contact Window_GF_Toilet 		"Toilet [MAP(en.map):%s]"			(GF_Toilet, Windows)
+
+Contact Window_FF_Bath 			"Bath [MAP(en.map):%s]"				(FF_Bath, Windows)
+Contact Window_FF_Bed 			"Bedroom [MAP(en.map):%s]"			(FF_Bed, Windows)
+Contact Window_FF_Office_Window "Office Window [MAP(en.map):%s]"	(FF_Office, Windows)
+Contact Window_FF_Office_Door 	"Balcony Door [MAP(en.map):%s]"		(FF_Office, Windows)
+
+Contact Garage_Door 			"Garage Door [MAP(en.map):%s]"		(Outdoor, Windows)
+
+
+DateTime Weather_LastUpdate		"Last Update [%1$ta %1$tR]"	<clock>
+
+/* NTP binding demo item */
+DateTime		Date			"Date [%1$tA, %1$td.%1$tm.%1$tY]"	<calendar>	{ ntp="Europe/Berlin:de_DE" }
+
+/* Demo items */
+Switch DemoSwitch				"Switch"
+Dimmer DimmedLight				"Dimmer [%d %%]"		<slider>
+Color  RGBLight					"RGB Light"				<slider>
+Rollershutter DemoShutter	 	"Roller Shutter"
+Dimmer DemoBlinds			 	"Blinds [%d %%]"		<rollershutter>
+Number Scene_General			"Scene"					<sofa>
+Number Radio_Station			"Radio"					<network>
+Dimmer Volume 					"Volume [%.1f %%]"
+Number Temperature_Setpoint		"Temperature [%.1f Â°C]" <temperature>
+
+String UnknownDevices    "Unknown Devices in Range: [%s]" { bluetooth="?" }
+Number NoOfPairedDevices "Paired Devices in Range: [%d]"  { bluetooth="!" }
+

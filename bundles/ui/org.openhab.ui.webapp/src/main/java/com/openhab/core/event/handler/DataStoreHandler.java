@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.openhab.core.items.ItemRegistry;
+import org.openhab.core.persistence.internal.PersistenceManager;
+import org.openhab.model.rule.internal.engine.RuleEngine;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -26,9 +28,15 @@ public class DataStoreHandler extends AbstractEventHandler {
 		System.out.println("\n DataStoreHandler->handleEvent->itemName"+eventObject.getItemName()+"->command->"+eventObject.getCommand());
 		ItemRegistry	itemRegistrty	=	eventObject.getItemRegistry();
 
+		PersistenceManager	persistanceManager	=	eventObject.getPersistanceManager();
+		RuleEngine	ruleEngine	=	eventObject.getRuleEngine();
+		
 		CloudEventPublisherImpl	cloudEventPublisherImpl	=	new CloudEventPublisherImpl();
 		cloudEventPublisherImpl.setItemRegistry(itemRegistrty);
 		cloudEventPublisherImpl.setModelRepository(eventObject.getModelRepository());
+		cloudEventPublisherImpl.setPersistenceManager(persistanceManager);
+		cloudEventPublisherImpl.setRuleEngine(ruleEngine);
+		
 		cloudEventPublisherImpl.sendCommand(eventObject.getItemName(), eventObject.getCommand());
 		
 		

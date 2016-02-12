@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openhab.core.db.CloudPersistenceManager;
+import com.openhab.core.dto.CloudMasterData;
 import com.openhab.core.event.dto.EventObject;
 import com.openhab.core.internal.event.dto.CloudEvent;
 import com.openhab.core.internal.event.dto.CloudEventProperty;
@@ -119,6 +120,16 @@ public class CloudEventPublisherImpl implements EventPublisher {
 				ruleEngine.activate();
 */				
 				System.out.println("\n CloudEventPublisheImpl->sendCommand->Command is not null");
+				System.out.println("\nCloudEventPublisheImpl->publishData->MasterData->"+Thread.currentThread().getId()+":MasterData:"+CloudThreadLocalStorage.getCloudMasterData());				
+				
+				CloudMasterData	masterData	=	new CloudMasterData();
+				masterData.setItemRegistry(itemRegistry);
+				masterData.setModelRepository(modelRepository);
+				
+				//masterData.setTopicName(topicName);
+				
+				CloudThreadLocalStorage.setCloudMasterData(masterData);
+				
 				CloudAutoUpdateBinding	cloudAutoUpdateBinding	=	new CloudAutoUpdateBinding();
 				cloudAutoUpdateBinding.setItemRegistry(itemRegistry);
 				cloudAutoUpdateBinding.handleEvent(createCommandEvent(itemName, command));
@@ -128,6 +139,7 @@ public class CloudEventPublisherImpl implements EventPublisher {
 				MqttItemBinding	cloudMqttItemBinding	=	new MqttItemBinding();
 				cloudMqttItemBinding.addBindingProvider(mqttGenericBindingProvider);
 				cloudMqttItemBinding.receiveCommand(itemName, command);
+
 				
 /*				ItemUpdater	itemUpdater	=	new ItemUpdater();
 				itemUpdater.setItemRegistry(itemRegistry);

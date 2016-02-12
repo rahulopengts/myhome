@@ -100,7 +100,7 @@ public class ModelRepositoryImpl implements ModelRepository {
 							Map<String, String> options = new HashMap<String, String>();
 							options.put(XtextResource.OPTION_ENCODING, "UTF-8");
 							resource.load(inputStream, options);
-							//System.out.println("\n***ModelrepositoryImpl->addOrRefreshModel->Adding for "+name);
+							System.out.println("\n***ModelrepositoryImpl->addOrRefreshModel->Loading"+name);
 							notifyListeners(name, EventType.ADDED);
 							return true;
 						} catch (IOException e) {

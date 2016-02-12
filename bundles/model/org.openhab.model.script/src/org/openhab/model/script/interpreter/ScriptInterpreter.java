@@ -49,6 +49,7 @@ public class ScriptInterpreter extends XbaseInterpreter {
 
 	protected Object _featureCallJvmIdentifyableElement(JvmIdentifiableElement identifiable, XFeatureCall featureCall, Object receiver,
 			IEvaluationContext context, CancelIndicator indicator) {
+		
 		Object value = super._featureCallJvmIdentifyableElement(identifiable, featureCall, receiver, context, indicator);
 		if(value==null && receiver==null) {
 			for(Type type : stateAndCommandProvider.getAllTypes()) {
@@ -63,6 +64,7 @@ public class ScriptInterpreter extends XbaseInterpreter {
 	
 	protected Object internalFeatureCallDispatch(XAbstractFeatureCall featureCall, Object receiverObj,
 			IEvaluationContext context, CancelIndicator indicator) {
+		
 		if(featureCall.getFeature().eIsProxy()) {
 			throw new RuntimeException("The name '" + featureCall.toString() + "' cannot be resolved to an item or type.");
 		}
@@ -76,6 +78,7 @@ public class ScriptInterpreter extends XbaseInterpreter {
 	}
 
 	protected Item getItem(String itemName) {
+		
 		ItemRegistry itemRegistry = itemRegistryProvider.get();
 		try {
 			return itemRegistry.getItem(itemName);

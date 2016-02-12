@@ -31,6 +31,8 @@ import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.openhab.core.threadstore.CloudThreadLocalStorage;
+
 /**
  * The static methods of this class are made available as functions in the scripts.
  * This allows a script to call another script, which is available as a file.
@@ -54,6 +56,7 @@ public class ScriptExecution {
 	 * @throws ScriptExecutionException if an error occurs during the execution
 	 */
 	public static Object callScript(String scriptName) throws ScriptExecutionException {
+		System.out.println("\nScriptExecute->callScript->MasterData->"+Thread.currentThread().getId()+":MasterData:"+CloudThreadLocalStorage.getCloudMasterData());
 		ModelRepository repo = ScriptActivator.modelRepositoryTracker.getService();
 		if(repo!=null) {
 			String scriptNameWithExt = scriptName;

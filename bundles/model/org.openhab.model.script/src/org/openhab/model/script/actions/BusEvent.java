@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
+import com.openhab.core.threadstore.CloudThreadLocalStorage;
 
 /**
  * The static methods of this class are made available as functions in the scripts.
@@ -76,7 +77,8 @@ public class BusEvent {
 	 */
 	static public Object sendCommand(String itemName, String commandString) {
 		
-
+		System.out.println("\nBusEvent->sendCoammand->MasterData->"+Thread.currentThread().getId()+":MasterData:"+CloudThreadLocalStorage.getCloudMasterData());
+		
 		ItemRegistry registry = (ItemRegistry) ScriptActivator.itemRegistryTracker.getService();
 		EventPublisher publisher = (EventPublisher) ScriptActivator.eventPublisherTracker.getService();
 		if(publisher!=null && registry!=null) {

@@ -43,9 +43,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openhab.core.constant.CloudHomeAutoConstants;
+import com.openhab.core.dto.CloudMasterData;
 import com.openhab.core.event.dto.EventObject;
 import com.openhab.core.event.handler.EventManager;
-import com.openhab.core.internal.event.processor.CloudAutoUpdateBinding;
 import com.openhab.core.threadstore.CloudThreadLocalStorage;
 
 /**
@@ -119,9 +119,14 @@ public class CmdServlet extends BaseServlet {
 				eventObject.setRuleEngine(ruleEngine);
 				eventObject.setPersistanceManager(persistenceManager);
 
-				CloudThreadLocalStorage.setLocalEventObject(eventObject);
-				CloudThreadLocalStorage.setLocalHomeId("RR");
-				System.out.println("\nCmdServlet->eventObject->"+Thread.currentThread().getId()+":EVENTOBJECT:"+eventObject);
+				CloudMasterData	masterData	=	new CloudMasterData();
+				masterData.setItemRegistry(cloudItemRegistry);
+				masterData.setModelRepository(cloudModelRepository);
+				//masterData.setTopicName(topicName);
+				
+				CloudThreadLocalStorage.setCloudMasterData(masterData);
+//				CloudThreadLocalStorage.setLocalHomeId("RR");
+				System.out.println("\nCmdServlet->eventObject->"+Thread.currentThread().getId()+":MasterData:"+masterData);
 				
 				eventPublisher	=	(EventPublisher)CloudSessionManager.getAttribute(CloudSessionManager.getSession((HttpServletRequest)req, (HttpServletResponse)res), CloudSessionManager.EVENTPUBLISHER);
 				//EventPublisher eventPublisher	=	new EventPublisherImpl();

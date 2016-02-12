@@ -212,6 +212,7 @@ public abstract class AbstractMqttMessagePubSub implements BindingConfig {
 		BundleContext context = MqttActivator.getContext();
 		transformationService = 
 			TransformationHelper.getTransformationService(context, getTransformationServiceName());
+		System.out.println("\nAbstractMqttMessagePubSub->initTransformService->"+transformationService);
 		if (transformationService == null) {
 			logger.debug("No transformation service found for {}", getTransformationServiceName());
 		}

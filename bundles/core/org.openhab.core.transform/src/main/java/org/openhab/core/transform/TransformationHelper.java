@@ -29,6 +29,7 @@ public class TransformationHelper {
 	 */
 	static public TransformationService getTransformationService(BundleContext context, String transformationType) {
 		if(context!=null) {
+			System.out.println("TransformationHelper->getTransformationService->transformationType->"+transformationType);
 			String filter = "(openhab.transform=" + transformationType + ")";
 			try {
 				Collection<ServiceReference<TransformationService>> refs = context.getServiceReferences(TransformationService.class, filter);

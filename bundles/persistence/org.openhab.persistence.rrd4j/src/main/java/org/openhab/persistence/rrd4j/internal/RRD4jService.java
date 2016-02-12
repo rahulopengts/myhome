@@ -186,6 +186,7 @@ public class RRD4jService implements QueryablePersistenceService {
 						if(filter.getEndDate()==null) {
 							// we are asked only for the most recent value!
 							double lastValue = db.getLastDatasourceValue(DATASOURCE_STATE);
+							System.out.println("\n RRD4JService->query->6 "+itemName+"->LastValue State->"+lastValue);
 							if(!Double.isNaN(lastValue)) {
 								HistoricItem rrd4jItem = new RRD4jItem(itemName, mapToState(lastValue, itemName), new Date(db.getLastArchiveUpdateTime() * 1000));
 								return Collections.singletonList(rrd4jItem);

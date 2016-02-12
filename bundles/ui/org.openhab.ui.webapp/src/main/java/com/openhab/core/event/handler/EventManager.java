@@ -45,9 +45,9 @@ public class EventManager	{// implements IEventManager{
 	
 	public void publishData(String itemName, Command command,ItemRegistry itemRegistry,ModelRepository modelRepository,PersistenceManager persistenceManager,RuleEngine ruleEngine,EventObject eventObject){
 	
-		EventObject	eventObject1	=	CloudThreadLocalStorage.getLocalEventObject();
-		System.out.println("\nCmdCloudEventPunblisherImpl->eventObject->"+eventObject1);
-		System.out.println("\nCmdCloudEventPunblisherImpl->HomeID->"+Thread.currentThread().getId()+":Local:"+CloudThreadLocalStorage.getLocalHomeId());
+		
+//		CloudThreadLocalStorage.setLocalHomeId("RR");
+		System.out.println("\nEventManager->publishData->MasterData->"+Thread.currentThread().getId()+":MasterData:"+CloudThreadLocalStorage.getCloudMasterData());
 		
 		
 		cloudRuleEngine=	ruleEngine;

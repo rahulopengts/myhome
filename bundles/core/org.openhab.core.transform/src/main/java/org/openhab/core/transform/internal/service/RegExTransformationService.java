@@ -34,7 +34,7 @@ public class RegExTransformationService implements TransformationService {
 	 * @{inheritDoc
 	 */
 	public String transform(String regExpression, String source) throws TransformationException {
-		
+		System.out.println("RegExTransformationService->transform->"+regExpression+"->source->"+source);
 		if (regExpression == null || source == null) {
 			throw new TransformationException("the given parameters 'regex' and 'source' must not be null");
 		}

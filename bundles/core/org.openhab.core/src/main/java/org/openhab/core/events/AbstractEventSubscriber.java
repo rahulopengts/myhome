@@ -33,7 +33,7 @@ abstract public class AbstractEventSubscriber implements EventSubscriber, EventH
 		}
 		String operation = topicParts[1];
 		
-		System.out.println("\nAbstractEventSubscriber->handleEvent->==:Thread "+Thread.currentThread().getId()+":ThreadName:"+Thread.currentThread().getName()+":->topicParts->"+topicParts[1]);
+		//System.out.println("\nAbstractEventSubscriber->handleEvent->==:Thread "+Thread.currentThread().getId()+":ThreadName:"+Thread.currentThread().getName()+":->topicParts->"+topicParts[1]);
 		
 		if(operation.equals(EventType.UPDATE.toString())) {
 			State newState = (State) event.getProperty("state");
@@ -41,9 +41,10 @@ abstract public class AbstractEventSubscriber implements EventSubscriber, EventH
 			if(newState!=null) receiveUpdate(itemName, newState);
 		}
 		if(operation.equals(EventType.COMMAND.toString())) {
+			Object recObject	=	event.getProperty("command");
 			Command command = (Command) event.getProperty("command");
-			System.out.println("\nAbstractEventSubscriber->handleEvent->operation==COMMAND :"+this);
-			System.out.println("\nAbstractEventSubscriber->handleEvent->operation==COMMAND Item :"+itemName+"->Command->"+command);
+			//System.out.println("\nAbstractEventSubscriber->handleEvent->operation==COMMAND :"+this);
+			System.out.println("\nAbstractEventSubscriber->handleEvent->operation==COMMAND ItemName :"+itemName+"->Command->"+command+"->object binding->"+this+"->Received Command Type->"+recObject.getClass().getCanonicalName());
 			if(command!=null) receiveCommand(itemName, command);
 		}
 	}

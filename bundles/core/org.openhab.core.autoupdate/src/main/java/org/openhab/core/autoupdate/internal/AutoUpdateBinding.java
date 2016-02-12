@@ -63,7 +63,7 @@ public class AutoUpdateBinding extends AbstractBinding<AutoUpdateBindingProvider
 	 */
 	@Override
 	public void receiveCommand(String itemName, Command command) {
-		System.out.println("\nAutoUpdateBinding->receiveCommand->itemName->"+itemName+"->Command->"+command+"->Provider->");
+		System.out.println("\nAutoUpdateBinding->receiveCommand->itemName->"+itemName+"->Command->"+command.getClass()+"->Provider->"+this);
 		Boolean autoUpdate = null;
 		for (AutoUpdateBindingProvider provider : providers) {
 			//System.out.println("\nAutoUpdateBinding->receiveCommand->itemName->"+itemName+"->Command->"+command+"->Provider->"+provider.getClass()+"getItemName");

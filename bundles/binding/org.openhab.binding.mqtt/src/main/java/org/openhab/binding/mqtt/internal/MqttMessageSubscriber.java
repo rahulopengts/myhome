@@ -113,9 +113,10 @@ public class MqttMessageSubscriber extends AbstractMqttMessagePubSub implements
 
 	@Override
 	public void processMessage(String topic, byte[] message) {
-System.out.println("\n MqttMessageSubscriber->processMessage->"+topic+":message:->"+new String(message));
+		System.out.println("\n MqttMessageSubscriber->processMessage->"+topic+":message:->"+new String(message));
 		try {
-
+			System.out.println("\n MqttMessageSubscriber->processMessage->getTransformationServiceName():->"+getTransformationServiceName());
+			
 			if (getTransformationServiceName() != null
 					&& getTransformationService() == null) {
 				logger.debug("Received message before transformation service '{}' was initialized.");
@@ -124,6 +125,8 @@ System.out.println("\n MqttMessageSubscriber->processMessage->"+topic+":message:
 
 			String value = new String(message);
 
+			System.out.println("\n MqttMessageSubscriber->processMessage->value():->"+value);	
+			
 			if (!msgFilterApplies(value)) {
 				logger.debug(
 						"Skipped message '{}' because Message Filter '{}' does not apply.",
@@ -134,15 +137,17 @@ System.out.println("\n MqttMessageSubscriber->processMessage->"+topic+":message:
 			if (getTransformationService() != null) {
 				value = getTransformationService().transform(
 						getTransformationServiceParam(), value);
+				System.out.println("\n MqttMessageSubscriber->processMessage->getTransformationService().transform:->"+value);
 			} else if (getTransformationRule() != null
 					&& !getTransformationRule().equalsIgnoreCase("default")) {
 				value = getTransformationRule();
+				System.out.println("\n MqttMessageSubscriber->processMessage->getTransformationService().transform:->"+value);
 			}
 
 			value = StringUtils.replace(value, "${itemName}", getItemName());
-
+			System.out.println("\n MqttMessageSubscriber->processMessage->getTransformationService().transform:value repalce->"+value);			
 			if (getMessageType().equals(MessageType.COMMAND)) {
-				
+				System.out.println("\n MqttMessageSubscriber->processMessage->getTransformationServiceName():->"+getTransformationServiceName());	
 				Command command = getCommand(value);
 				eventPublisher.postCommand(getItemName(), command);
 				System.out.println("\n MqttMessageSubscriber->processMessage->getItemName"+getItemName()+":command:->"+command.toString());

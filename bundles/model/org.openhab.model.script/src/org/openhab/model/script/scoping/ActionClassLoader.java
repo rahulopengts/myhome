@@ -29,7 +29,9 @@ final public class ActionClassLoader extends ClassLoader {
 	public Class<?> loadClass(String name)
 			throws ClassNotFoundException {
 		try {
+
 			Class<?> clazz = getParent().loadClass(name);
+
 			return clazz;
 		} catch(ClassNotFoundException e) {
 			Object[] services = ScriptActivator.actionServiceTracker.getServices();

@@ -53,6 +53,7 @@ public class ScriptEngineImpl implements ScriptEngine {
 	public ScriptEngineImpl() {}
 	
 	public void activate() {
+		System.out.println("\nScriptEngineImpl-activate->");
 		this.guiceInjector = new ScriptStandaloneSetup().createInjectorAndDoEMFRegistration();
 		this.resourceSet = guiceInjector.getInstance(XtextResourceSet.class);
 		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
@@ -68,6 +69,7 @@ public class ScriptEngineImpl implements ScriptEngine {
 	 */
 	public Script newScriptFromString(String scriptAsString)
 			throws ScriptParsingException {
+		System.out.println("\nScriptEngineImpl-newScriptFromString->"+scriptAsString);
 		return newScriptFromXExpression(parseScriptIntoXTextEObject(scriptAsString));
 	}
 
@@ -76,6 +78,7 @@ public class ScriptEngineImpl implements ScriptEngine {
 	 */
 	public Script newScriptFromXExpression(XExpression expression) {
 		ScriptImpl script = guiceInjector.getInstance(ScriptImpl.class);
+		System.out.println("\nScriptEngineImpl-newScriptFromXExpression->"+expression);		
 		script.setXExpression(expression);
 		return script;
 	}
@@ -85,12 +88,14 @@ public class ScriptEngineImpl implements ScriptEngine {
 	 */
 	public Object executeScript(String scriptAsString)
 			throws ScriptParsingException, ScriptExecutionException {
+		System.out.println("\nScriptEngineImpl-executeScript->"+scriptAsString);
 		return newScriptFromString(scriptAsString).execute();
 	}
 
 	private XExpression parseScriptIntoXTextEObject(String scriptAsString) throws ScriptParsingException {
 		Resource resource = resourceSet.createResource(computeUnusedUri(resourceSet)); // IS-A XtextResource
 		try {
+			System.out.println("\nScriptEngineImpl-parseScriptIntoXTextEObject->"+scriptAsString);
 			resource.load(new StringInputStream(scriptAsString), resourceSet.getLoadOptions());
 		} catch (IOException e) {
 			throw new ScriptParsingException("Unexpected IOException; from close() of a String-based ByteArrayInputStream, no real I/O; how is that possible???", scriptAsString, e);
@@ -106,6 +111,7 @@ public class ScriptEngineImpl implements ScriptEngine {
 		if (!contents.isEmpty()) {
 			Iterable<Issue> validationErrors = getValidationErrors(contents.get(0));
 			if(!validationErrors.iterator().hasNext()) {
+				System.out.println("\nScriptEngineImpl-parseScriptIntoXTextEObject->2->"+scriptAsString);
 				return (XExpression) contents.get(0);
 			} else {
 				throw new ScriptParsingException("Failed to parse expression (due to managed ValidationError/s)", scriptAsString).addValidationIssues(validationErrors);
@@ -133,6 +139,7 @@ public class ScriptEngineImpl implements ScriptEngine {
 	}
 	
 	protected Iterable<Issue> getValidationErrors(final EObject model) {
+		System.out.println("\nScriptEngineImpl-getValidationErrors->"+model);
 		final List<Issue> validate = validate(model);
 		Iterable<Issue> issues = filter(validate, new Predicate<Issue>() {
 			public boolean apply(Issue input) {

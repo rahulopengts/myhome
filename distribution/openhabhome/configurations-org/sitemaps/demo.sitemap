@@ -1,0 +1,48 @@
+sitemap rahul label="Rahul's Home"
+{
+	Frame {
+		Group item=rHFF label="Rahul's Home" icon="cellar" {
+			Group item=RH_Living {
+				Switch item=Fan				
+				Switch item=Light				
+				Switch item=Dishwasher				
+				Switch item=Node01				
+				Switch item=Node02				
+				Switch item=Node03				
+				Switch item=Node04				
+			}			
+			Group item=RH_Kitchen {
+				Group item=Window {
+					Text item=Windows_GF_Frontdoor					
+					Text item=Windows_GF_Kitchen					
+				}				
+				Text item=Windows_GF_Frontdoor				
+				Text item=Windows_GF_Kitchen				
+			}			
+			Group item=RH_Toilet			
+			Group item=RH_Corridor {
+				Switch item=Node05S0				
+				Switch item=Node05S1				
+				Switch item=Node05S2				
+				Switch item=Node05S33				
+				Text item=dayPhase				
+			}			
+		}		
+	}	
+	Frame label="Date" {
+		Text item=Date		
+	}	
+	Frame label="Day Phase" {
+		Text label="It's Night" icon="moon" visibility=[dayPhase==10]		
+		Text label="It's Evening" icon="moon" visibility=[dayPhase==20]		
+		Text label="It's Hot Day" icon="moon" visibility=[dayPhase==30]		
+	}	
+	
+	Frame label="Health" {
+		Group item=health label="System Health" icon="cellar" {
+			Text item=repeaterBattery
+		}
+		
+	}	
+
+}

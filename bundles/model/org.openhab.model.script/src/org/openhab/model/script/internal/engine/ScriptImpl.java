@@ -57,18 +57,22 @@ public class ScriptImpl implements Script {
 		
 		if(xExpression!=null) {
 			//CloudThreadLocalStorage.setLocalHomeId("HOME1");
-		    System.out.println("\nScriptImpl->execute->HOME1");
+		    System.out.println("\nScriptImpl->execute->HOME2");
 			try {
 		    	IEvaluationResult result = interpreter.evaluate(xExpression, evaluationContext, CancelIndicator.NullImpl);
-			    if(result==null) {
+		    	System.out.println("\nScriptImpl->execute->result "+result);
+		    	if(result==null) {
+		    		
 			    	// this can only happen on an InterpreterCancelledException, i.e. NEVER ;-)
 			    	return null;
 			    }
 			    if (result.getException() != null) {
+			    	System.out.println("\nScriptImpl->getExecption NOT NULL->");
 			        throw new ScriptExecutionException(result.getException().getMessage(), result.getException());
 			    } 
 			    return result.getResult();
 		    } catch(Throwable e) {
+		    	e.printStackTrace();
 		    	if(e instanceof ScriptExecutionException) {
 		    		throw (ScriptExecutionException) e;
 		    	} else {

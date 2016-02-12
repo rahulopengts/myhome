@@ -14,6 +14,7 @@ public class RuleHandler extends AbstractEventHandler {
 	public void handleRule(EventObject eventObject, String topic,
 			String messageContent) {
 		// TODO Auto-generated method stub
+		System.out.println("\nRuleHandler-handleRule->");
 		RuleEngine ruleEngine	=	new RuleEngine();
 		ruleEngine.setItemRegistry(eventObject.getItemRegistry());
 		ScriptEngine	scriptEngine	=	new ScriptEngineImpl();

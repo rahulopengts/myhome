@@ -29,6 +29,7 @@ public class WundergroundProvider extends AbstractWeatherProvider {
 	 */
 	@Override
 	public ProviderName getProviderName() {
+		System.out.println("\nWundergroundProvider->getProderName->"+ProviderName.WUNDERGROUND);
 		return ProviderName.WUNDERGROUND;
 	}
 

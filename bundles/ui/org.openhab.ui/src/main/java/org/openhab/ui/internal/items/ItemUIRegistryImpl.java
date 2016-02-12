@@ -241,13 +241,14 @@ public class ItemUIRegistryImpl implements ItemUIRegistry {
 				// and will cause an 'java.util.IllegalFormatConversionException:
 				// d != java.lang.String' later on when trying to format a String
 				// as %d (number).
-				//System.out.println("\nItemUIRegistryImpl->getLabel->itemName->"+itemName);
+				System.out.println("\nItemUIRegistryImpl->getLabel->itemName->"+itemName);
 				if (label.contains("%d")) {
+					System.out.println("\nItemUIRegistryImpl->getLabel->contains%d->"+label+"-> for item->"+item);
 					// a number is requested
 					//System.out.println("\nItemUIRegistryImpl->getLabel->contains%d->"+label);
 					state = item.getState();
 					if(!(state instanceof DecimalType)) {
-						//System.out.println("\nItemUIRegistryImpl->getLabel->instanceof DecimalType->"+label);
+						System.out.println("\nItemUIRegistryImpl->getLabel->contains%d->"+label+"-> for item->"+item);
 						state = item.getStateAs(DecimalType.class);
 					}
 				} else {

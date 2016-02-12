@@ -53,6 +53,7 @@ public class WeatherBinding extends AbstractBinding<WeatherBindingProvider> impl
 	public void activate() {
 		context.setProviders(providers);
 		try {
+			System.out.println("\n Weather-WeatherBinding->activate->"+this);
 			MetadataHandler.getInstance().generate(Weather.class);
 			CommonIdHandler.getInstance().loadMapping();
 		} catch (Exception ex) {
@@ -73,6 +74,7 @@ public class WeatherBinding extends AbstractBinding<WeatherBindingProvider> impl
 	 */
 	@Override
 	public void updated(Dictionary<String, ?> config) throws ConfigurationException {
+		System.out.println("\n WeatherBinding->updated");
 		if (config != null) {
 			context.getJobScheduler().stop();
 
